@@ -41,7 +41,7 @@ def save_province(data):
 
     province = pd.DataFrame(province)
     province.columns = ['province_id', 'province_name', 'province_confirmedNum', 'province_deathsNum', 'province_curesNum']
-    province.to_csv("COVID19_province.csv", index=False)
+    province.to_csv("../data/COVID19_province.csv", index=False)
 
 
 # 地级市数据
@@ -74,7 +74,7 @@ def save_city(data):
 
     city = pd.DataFrame(city)
     city.columns = ['city_id', 'city_name', 'city_confirmedNum', 'city_deathsNum', 'city_curesNum', 'province_name', 'province_id']
-    city.to_csv("COVID19_city.csv", index=False)
+    city.to_csv("../data/COVID19_city.csv", index=False)
 
 
 # 区县级数据
@@ -115,7 +115,7 @@ def save_distinct(data):
     distinct= pd.DataFrame(distinct)
     distinct.columns = ['distinct_id', 'distinct_name', 'distinct_confirmedNum', 'distinct_deathsNum', 'distinct_curesNum',
                         'city_name', 'city_id', 'province_name', 'province_id']
-    distinct.to_csv("COVID19_distinct.csv", index=False)
+    distinct.to_csv("../data/COVID19_distinct.csv", index=False)
 
 
 
