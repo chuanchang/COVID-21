@@ -56,9 +56,7 @@ def save_city(data):
         temp = temp['cities']
 
         for j in range(len(temp)):
-
             city_id = temp[j]['id']
-
             city_name = temp[j]['name']
 
             # 累计确诊人数
@@ -90,29 +88,33 @@ def save_distinct(data):
 
         for j in range(len(temp)):
             city_id = temp[j]['id']
-
             city_name = temp[j]['name']
 
-            if city_id.isdigit() and len(city_id)<6:
+            if city_id.isdigit() and len(city_id) < 6:
+
                 # data url
                 distinct_url = "https://i.snssdk.com/toutiao/normandy/pneumonia_trending/district_stat/?local_id=" + city_id.ljust(6,'0')
                 with urllib.request.urlopen(distinct_url) as f:
                     distinct_data = json.loads(f.read().decode('utf-8'))
                     distinct_data = distinct_data['data']['list']
+
                     for k in range(len(distinct_data)):
                         distinct_id = distinct_data[k]['local_id']
                         distinct_name = distinct_data[k]['name']
+
                         # 累计确诊人数
                         distinct_confirmedNum = distinct_data[k]['confirmed_count']
+
                         # 累计死亡人数
                         distinct_deathsNum = distinct_data[k]['death_count']
+
                         # 累计治愈人数
                         distinct_curesNum = distinct_data[k]['cured_count']
 
                         distinct.append([distinct_id, distinct_name, distinct_confirmedNum, distinct_deathsNum,
                                          distinct_curesNum, city_name, city_id, province_name, province_id])
 
-    distinct= pd.DataFrame(distinct)
+    distinct = pd.DataFrame(distinct)
     distinct.columns = ['distinct_id', 'distinct_name', 'distinct_confirmedNum', 'distinct_deathsNum', 'distinct_curesNum',
                         'city_name', 'city_id', 'province_name', 'province_id']
     distinct.to_csv("../data/COVID19_distinct.csv", index=False)
