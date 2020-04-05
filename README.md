@@ -25,3 +25,24 @@ python COVID19_from_TouTiao.py
 区县级疫情数据
 /data/COVID19_distinct.csv
 ```
+
+
+## 2015中国区县级shp文件COVID-19属性加入
+
+```shell
+# 将上面COVID-19中国各行政级数据获取数据加进2015年中国区县级shp文件的属性表里
+
+cd code
+
+python china_distinct_shp_COVID19.py
+```
+
+#### 数据说明
+
+```shell
+中国2015年区县级shp文件
+/shp/china_all_dissolve.shp  
+
+中国2015年区县级shp文件（含有COVID19累计确诊人数属性）
+/shp/china_all_dissolve_COVID19.shp
+```
