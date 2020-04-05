@@ -45,4 +45,7 @@ python china_distinct_shp_COVID19.py
 
 中国2015年区县级shp文件（含有COVID19累计确诊人数属性）
 /shp/china_all_dissolve_COVID19.shp
+
+中国2015年区县级shp文件（含有COVID19累计确诊人数属性）mxd文件
+/shp/COVID19_2015_distinct.mxd
 ```
