@@ -107,8 +107,24 @@ def save_province(data, china_location):
 
 
 # 地级市数据
-def save_city(china_location):
+def save_city(data, china_location):
     city = []
+
+    for i in range(len(data)):
+        temp = data[i]
+        province_id = int(temp['id']) * 10000
+
+        if province_id in [110000, 120000, 310000, 500000]:
+            # 累计确诊人数
+            province_confirmedNum = temp['confirmedNum']
+
+            # 累计死亡人数
+            province_deathsNum = temp['deathsNum']
+
+            # 累计治愈人数
+            province_curesNum = temp['curesNum']
+
+            city.append([province_id, province_confirmedNum, province_deathsNum, province_curesNum, province_id])
 
     china_province = china_location.loc[china_location['province'] == 1, ['id', 'location']]
     china_province.columns = ['province_id', 'province_name']
@@ -277,7 +293,7 @@ print("end!")
 
 # city data
 print("start get city data")
-save_city(china_location)
+save_city(data, china_location)
 print("end!")
 
 

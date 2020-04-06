@@ -46,6 +46,10 @@ python china_distinct_shp_COVID19.py
 中国2015年区县级shp文件（含有COVID19累计确诊人数属性）
 /shp/china_all_dissolve_COVID19.shp
 
-中国2015年区县级shp文件（含有COVID19累计确诊人数属性）mxd文件
+中国2015年区县级shp文件（含有COVID19累计确诊人数属性）mxd文件——软件是ArcMap10.2
 /shp/COVID19_2015_distinct.mxd
+
+中国2015年区县级COVID19空间自相关分析——软件是GeoDa
+/shp/COVID19_2015_distinct.mxd
+
 ```
