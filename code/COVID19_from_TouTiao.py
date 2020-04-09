@@ -9,7 +9,7 @@
 1. 行政编码和命名清洗
 
 以中国民政部2015的县级及以上行政编码为准：http://www.mca.gov.cn/article/sj/tjbz/a/2015/201706011127.html
-对数据进行清洗，校正错误编码
+对数据进行清洗，校正错误编码；个别地方如经开区、高新区等等，已经手工写了规则做了转换，有些找不到对应区县，作了去除
 
 2. 去除境外来源数据
 
@@ -17,11 +17,7 @@
 
 4. 去除外来人口数据
 
-TODO：
-5. 某些城市没有区县级的数据
-
-暂时设定为0，或许需要将city和distinct的数据进行整合
-
+5. 某些城市没有区县级的数据，将城市数据放入区县级里
 """
 
 
@@ -75,6 +71,8 @@ correction_id = {'公主岭220000': 220381, '梅河口220000': 220581, '崇明31
                  '东升镇442000': 442000104, '横栏镇442000': 442000110, '民众镇442000': 442000102, '南区街道442000': 442000005,
                  '西区街道442000': 442000004, '东凤镇442000': 442000103, '三角镇442000': 442000109, '阜沙镇442000': 442000112, '三乡镇442000': 442000114, '板芙镇442000': 442000115,
                  }
+
+
 
 # 省级数据
 def save_province(data, china_location):
@@ -178,10 +176,12 @@ def save_city(data, china_location):
     city = city.fillna(value=0)
     city[['city_confirmedNum', 'city_deathsNum', 'city_curesNum']] = city[['city_confirmedNum', 'city_deathsNum', 'city_curesNum']].astype(int)
     city.to_csv("../data/COVID19_city.csv", index=False)
+    return city
 
 
 # 区县级数据
-def save_distinct(china_location):
+def save_distinct(china_location, city):
+    city_id_substitute = []
     distinct = []
 
     china_province = china_location.loc[china_location['province'] == 1, ['id', 'location']]
@@ -238,6 +238,9 @@ def save_distinct(china_location):
             city_data = json.loads(f.read().decode('utf-8'))
             city_data = city_data['data']['list']
 
+        if len(city_data) == 0:
+            city_id_substitute.append(id)
+
         for i in range(len(city_data)):
             temp = city_data[i]
             distinct_id = temp['local_id']
@@ -257,13 +260,18 @@ def save_distinct(china_location):
 
             if distinct_id in distinct_ids:
                 distinct.append([distinct_id, distinct_confirmedNum, distinct_deathsNum, distinct_curesNum])
-            else:
-                print(distinct_id, distinct_name, str(distinct_name) + str(id), distinct_confirmedNum, distinct_deathsNum, distinct_curesNum, id)
+            #else:
+            #print(distinct_id, distinct_name, str(distinct_name) + str(id), distinct_confirmedNum, distinct_deathsNum, distinct_curesNum, id)
 
     distinct = pd.DataFrame(distinct)
     distinct.columns = ['distinct_id', 'distinct_confirmedNum', 'distinct_deathsNum', 'distinct_curesNum']
 
     distinct = distinct.groupby('distinct_id').agg(sum).reset_index()
+
+    city_substitute = city[city['city_id'].isin(city_id_substitute)]
+    city_substitute = city_substitute[city_substitute['city_confirmedNum']>0]
+    print(city_substitute['city_id'])
+    aaaaa
 
     china_distinct = pd.merge(china_distinct, china_city, how='left', on=["city_id", 'province_id'])
     china_distinct = china_distinct.fillna(value=-1)
@@ -293,11 +301,11 @@ print("end!")
 
 # city data
 print("start get city data")
-save_city(data, china_location)
+city = save_city(data, china_location)
 print("end!")
 
 
 # dictinct data
 print("start get distinct data")
-save_distinct(china_location)
+save_distinct(china_location, city)
 print("end!")

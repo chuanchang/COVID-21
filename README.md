@@ -1,3 +1,5 @@
+[TOC]
+
 # COVID-19
 
 ## COVID-19中国各行政级数据获取
@@ -28,7 +30,7 @@ python COVID19_from_TouTiao.py
 ```
 
 
-## 2015中国区县级shp文件COVID-19属性加入
+### 2015中国区县级shp文件COVID-19属性加入
 
 ```shell
 # 将上面COVID-19中国各行政级数据获取数据加进2015年中国区县级shp文件的属性表里
@@ -67,6 +69,32 @@ python china_shp_COVID19.py
 /shp/COVID19_2015_COVID19.mxd
 
 中国2015年区县级COVID19空间自相关分析——软件是GeoDa
-/shp/COVID19_2015_Moran.mxd
 
+```
+
+## ECMWF ERA5数据获取
+
+```shell
+cd code
+
+# 2m temperature
+python t2m_from_ECMWF_ERA5.py
+
+# 1000hPa relative humidity
+python rh_from_ECMWF_ERA5.py
+```
+
+#### 数据说明
+
+```shell
+中国 2m temperature
+/data/ECMWF/t2m/
+
+t2m_20200101_0000.nc   2020年1月1日 00:00  netCDF  2m temperature
+
+
+中国 1000hPa relative humidity
+/data/ECMWF/rh/
+
+rh_20200101_0000.nc   2020年1月1日 00:00  netCDF  1000hPa relative humidity
 ```
