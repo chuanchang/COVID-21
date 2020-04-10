@@ -12,7 +12,7 @@ cd code
 python COVID19_from_TouTiao.py
 ```
 
-#### 数据说明
+### 数据说明
 
 ```shell
 中国2015年省级、地级市、区县级行政编码
@@ -69,7 +69,6 @@ python china_shp_COVID19.py
 /shp/COVID19_2015_COVID19.mxd
 
 中国2015年区县级COVID19空间自相关分析——软件是GeoDa
-
 ```
 
 ## ECMWF ERA5数据获取
@@ -84,7 +83,7 @@ python t2m_from_ECMWF_ERA5.py
 python rh_from_ECMWF_ERA5.py
 ```
 
-#### 数据说明
+### 数据说明
 
 ```shell
 中国 2m temperature
@@ -97,4 +96,32 @@ t2m_20200101_0000.nc   2020年1月1日 00:00  netCDF  2m temperature
 /data/ECMWF/rh/
 
 rh_20200101_0000.nc   2020年1月1日 00:00  netCDF  1000hPa relative humidity
+```
+
+
+## 百度迁徙数据获取
+
+```shell
+cd code
+
+# 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
+python migration_index_from_Baidu.py
+
+# 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
+python migration_index_from_Baidu_from_WuHan.py
+```
+
+### 数据说明
+
+```shell
+
+# 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
+/data/baidu_migration/city_migration.csv
+
+/data/baidu_migration/distinct_migration.csv
+
+# 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
+/data/baidu_migration/city_migration.csv
+
+/data/baidu_migration/distinct_migration.csv
 ```
