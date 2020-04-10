@@ -269,9 +269,14 @@ def save_distinct(china_location, city):
     distinct = distinct.groupby('distinct_id').agg(sum).reset_index()
 
     city_substitute = city[city['city_id'].isin(city_id_substitute)]
-    city_substitute = city_substitute[city_substitute['city_confirmedNum']>0]
+    city_substitute = city_substitute[city_substitute['city_confirmedNum'] > 0]
+    city_substitute = city_substitute[['city_id', 'city_confirmedNum', 'city_deathsNum', 'city_curesNum']]
+
+    print("The following cities don't contains distinct data!")
     print(city_substitute['city_id'])
-    aaaaa
+    distinct = pd.concat([distinct, city_substitute], axis=0)
+
+    '''
 
     china_distinct = pd.merge(china_distinct, china_city, how='left', on=["city_id", 'province_id'])
     china_distinct = china_distinct.fillna(value=-1)
@@ -289,6 +294,8 @@ def save_distinct(china_location, city):
 
     distinct = distinct[['distinct_id', 'distinct_name', 'distinct_confirmedNum', 'distinct_deathsNum', 'distinct_curesNum',
                          'city_id', 'city_name', 'province_id', 'province_name']]
+    
+    '''
 
     distinct.to_csv("../data/COVID19_distinct.csv", index=False)
 

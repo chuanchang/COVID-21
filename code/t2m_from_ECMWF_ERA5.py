@@ -29,6 +29,7 @@ def download(year, month, day, time):
 
 
 if __name__ == '__main__':
+
     years = ['2020']
     months = ['01', '02', '03']
     days = ['01', '02', '03',
@@ -52,6 +53,7 @@ if __name__ == '__main__':
         '18:00', '19:00', '20:00',
         '21:00', '22:00', '23:00',
     ]
+
     for year in years:
         for month in months:
             for day in days:
