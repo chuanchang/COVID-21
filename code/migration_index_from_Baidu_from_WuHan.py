@@ -4,7 +4,7 @@
 """
 百度迁徙数据平台：http://qianxi.baidu.com/?from=baiduse
 
-爬取武汉迁入各个城市的比例和迁徙指数
+爬取武汉迁入各个城市的比例和武汉的迁入和迁出迁徙指数，并计算乘积
 """
 
 # load package
@@ -113,5 +113,6 @@ if __name__ == '__main__':
     # migration
     china_city, china_distinct = epidemic_migration(china_city, china_distinct, epidemicIds, years, months, days)
     epidemic_distinct = pd.concat([china_city, china_distinct])
+
     # city migration
     epidemic_distinct.to_csv("../data/baidu_migration/city_migration_from_WuHan.csv", index=False)
