@@ -181,7 +181,9 @@ def save_city(data, china_location):
 
 # 区县级数据
 def save_distinct(china_location, city):
-    city_id_substitute = []
+
+    # 东莞市 中山市 台湾省 香港 澳门
+    city_id_substitute = [441900, 442000, 710000, 810000, 820000]
     distinct = []
 
     china_province = china_location.loc[china_location['province'] == 1, ['id', 'location']]
@@ -247,34 +249,38 @@ def save_distinct(china_location, city):
             distinct_name = temp['name']
 
             # 累计确诊人数
-            distinct_confirmedNum = temp['confirmed_count']
+            distinct_confirmedNum = temp['confirmed_count'] if temp['confirmed_count'] > 0 else 0
 
             # 累计死亡人数
-            distinct_deathsNum = temp['death_count']
+            distinct_deathsNum = temp['death_count'] if temp['death_count'] > 0 else 0
 
             # 累计治愈人数
-            distinct_curesNum = temp['cured_count']
+            distinct_curesNum = temp['cured_count'] if temp['cured_count'] > 0 else 0
 
             if distinct_name+str(id) in correction_id.keys():
                 distinct_id = correction_id[distinct_name+str(id)]
 
             if distinct_id in distinct_ids:
                 distinct.append([distinct_id, distinct_confirmedNum, distinct_deathsNum, distinct_curesNum])
-            #else:
-            #print(distinct_id, distinct_name, str(distinct_name) + str(id), distinct_confirmedNum, distinct_deathsNum, distinct_curesNum, id)
+            else:
+                print(distinct_id, distinct_name, str(distinct_name) + str(id), distinct_confirmedNum, distinct_deathsNum, distinct_curesNum, id)
 
     distinct = pd.DataFrame(distinct)
-    distinct.columns = ['distinct_id', 'distinct_confirmedNum', 'distinct_deathsNum', 'distinct_curesNum']
+    distinct.columns = ['id', 'confirmedNum', 'deathsNum', 'curesNum']
 
-    distinct = distinct.groupby('distinct_id').agg(sum).reset_index()
+    # 个别区县级数据安装校正编码集合校正后，需要按照id聚合统计
+    distinct = distinct.groupby('id').agg(sum).reset_index()
 
     city_substitute = city[city['city_id'].isin(city_id_substitute)]
     city_substitute = city_substitute[city_substitute['city_confirmedNum'] > 0]
     city_substitute = city_substitute[['city_id', 'city_confirmedNum', 'city_deathsNum', 'city_curesNum']]
+    city_substitute.columns = ['id', 'confirmedNum', 'deathsNum', 'curesNum']
 
     print("The following cities don't contains distinct data!")
-    print(city_substitute['city_id'])
-    distinct = pd.concat([distinct, city_substitute], axis=0)
+    print(city_substitute['id'])
+    distinct = pd.concat([distinct, city_substitute])
+
+    distinct = pd.merge(distinct, china_location[['id', 'location']], how='left', on='id')
 
     '''
 

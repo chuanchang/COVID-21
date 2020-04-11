@@ -104,17 +104,6 @@ if __name__ == '__main__':
 
     # China location id
     china_location = pd.read_csv("../data/china_location_id_2015.csv", sep=',')
-
-    china_city = china_location.loc[china_location['city'] == 1, ['id', 'location', 'province_id', 'city_baidu_id']]
-    china_city.columns = ['city_id', 'city_name', 'province_id', 'city_baidu_id']
-
-    print("china city num: " + str(len(china_location)))
-
-    # china distinct
-    china_distinct = china_location.loc[china_location['distinct'] == 1, ['id', 'location', 'city_id', 'city_baidu_id']]
-    china_distinct.columns = ['id', 'name', 'city_id', 'city_baidu_id']
-    print("china distinct num: " + str(len(china_distinct)))
-
     city_baidu_ids = list(set(china_location['city_baidu_id'].to_list()))
     print(len(city_baidu_ids))
 
@@ -143,16 +132,18 @@ if __name__ == '__main__':
     travel = travel_intensity(city_baidu_ids, years, months, days)
     print("china city travel: " + str(len(travel)))
 
+
+    id1 = moveIn['city_baidu_id'].to_list()
+    id2 = moveOut['city_baidu_id'].to_list()
+    id3 = travel['city_baidu_id'].to_list()
+
+    print(list(set(city_baidu_ids).difference(set(id1))))
+    print(list(set(city_baidu_ids).difference(set(id2))))
+    print(list(set(city_baidu_ids).difference(set(id3))))
+
+
     # city migration
-    china_city = pd.merge(china_city, moveIn, how='left', on='city_baidu_id')
-    china_city = pd.merge(china_city, moveOut, how='left', on='city_baidu_id')
+    china_city = pd.merge(moveIn, moveOut, how='left', on='city_baidu_id')
     china_city = pd.merge(china_city, travel, how='left', on='city_baidu_id')
-    china_city = china_city.drop('city_baidu_id', 1)
     china_city = china_city.fillna(value=0)
     china_city.to_csv("../data/baidu_migration/city_migration.csv", index=False)
-
-    # distinct migration
-    china_distinct = pd.merge(china_distinct, china_city, how='left', on='city_baidu_id')
-    china_distinct = china_distinct.fillna(value=0)
-    china_distinct = china_distinct.drop('city_baidu_id', 1)
-    china_distinct.to_csv("../data/baidu_migration/distinct_migration.csv", index=False)
