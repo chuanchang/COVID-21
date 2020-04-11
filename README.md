@@ -118,10 +118,8 @@ python migration_index_from_Baidu_from_WuHan.py
 # 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
 /data/baidu_migration/city_migration.csv
 
-/data/baidu_migration/distinct_migration.csv
 
-# 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
-/data/baidu_migration/city_migration.csv
+# 疫情城市迁入迁徙规模指数、迁出迁徙规模指数与比例的乘积
+/data/baidu_migration/city_migration_from_WuHan.csv
 
-/data/baidu_migration/distinct_migration.csv
 ```
