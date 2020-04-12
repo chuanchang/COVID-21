@@ -165,6 +165,27 @@ pac_class_id.csv
 
 ```
 
+### ERA5数据区县级统计
+```shell
+cd code
+
+# 2m temperature  1000hPa relative humidity
+
+python rh_distinct_statistics.py
+
+python t2m_distinct_statistics.py
+```
+
+### 数据说明
+
+```shell
+中国区县级 2m temperature 1000hPa relative humidity 统计
+
+/data/ECMWF/zonal_statistics/distinct_t2m.csv
+/data/ECMWF/zonal_statistics/distinct_rh.csv
+
+```
+
 ## 百度迁徙数据获取
 
 ```shell
