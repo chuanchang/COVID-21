@@ -1,5 +1,3 @@
-[TOC]
-
 # COVID-19
 
 ## COVID-19中国各行政级数据获取
@@ -71,8 +69,9 @@ python china_shp_COVID19.py
 中国2015年区县级COVID19空间自相关分析——软件是GeoDa
 ```
 
-## ECMWF ERA5数据获取
+## ECMWF ERA5数据获取及处理
 
+### ERA5数据获取，python下载，netCDF格式
 ```shell
 cd code
 
@@ -87,17 +86,84 @@ python rh_from_ECMWF_ERA5.py
 
 ```shell
 中国 2m temperature
-/data/ECMWF/t2m/
+/data/ECMWF/t2m/nc
 
 t2m_20200101_0000.nc   2020年1月1日 00:00  netCDF  2m temperature
 
 
 中国 1000hPa relative humidity
-/data/ECMWF/rh/
+/data/ECMWF/rh/nc
 
 rh_20200101_0000.nc   2020年1月1日 00:00  netCDF  1000hPa relative humidity
 ```
 
+### ERA5数据处理，IDL处理成envi standard
+```shell
+cd code
+
+# 2m temperature  1000hPa relative humidity ---- IDL
+
+netCDFToTiff.pro
+
+```
+
+### 数据说明
+
+```shell
+中国 2m temperature
+/data/ECMWF/t2m/tif
+
+t2m_20200101_0000.tif   2020年1月1日 00:00  envi standard  2m temperature
+
+
+中国 1000hPa relative humidity
+/data/ECMWF/rh/tif
+
+rh_20200101_0000.tif   2020年1月1日 00:00  envi standard  1000hPa relative humidity
+```
+
+### ERA5数据分区统计
+```shell
+cd code
+
+# 2m temperature  1000hPa relative humidity ---- IDL
+
+.pro
+
+```
+
+### 数据说明
+
+```shell
+中国区县级 2m temperature 分区统计
+/data/ECMWF/zonal_statistics
+
+2m temperature
+
+t2m.csv
+
+
+中国区县级 1000hPa relative humidity 分区统计
+/data/ECMWF/zonal_statistics
+
+1000hPa relative humidity
+
+rh.csv
+
+
+
+辅助文件：
+
+中国区县级分类文件
+/data/ECMWF/zonal_statistics
+
+class_id.tif  class_id.hdr
+
+
+class_id.tif的每个像元值代表id，id与区县行政编码的对应文件
+pac_class_id.csv
+
+```
 
 ## 百度迁徙数据获取
 
@@ -121,5 +187,4 @@ python migration_index_from_Baidu_from_WuHan.py
 
 # 疫情城市迁入迁徙规模指数、迁出迁徙规模指数与比例的乘积
 /data/baidu_migration/city_migration_from_WuHan.csv
-
 ```

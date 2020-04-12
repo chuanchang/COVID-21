@@ -21,9 +21,9 @@ def download(year, month, day, time):
                 'day': [day],
                 'time': [time],
                 'format': 'netcdf',
-                'area': [54, 73, 3, 136],
+                'area': [54, 73, 18, 136],
             },
-            '../data/ECMWF/rh/rh_' + year + month + day + '_' + time.replace(':', '') + '.nc')
+            '../data/ECMWF/rh/nc/rh_' + year + month + day + '_' + time.replace(':', '') + '.nc')
         print('rh_' + year + month + day + '_' + time + '.nc')
     except:
         pass
