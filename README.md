@@ -128,7 +128,7 @@ cd code
 
 # 2m temperature  1000hPa relative humidity ---- IDL
 
-.pro
+zonal_statistics.pro
 
 ```
 
@@ -136,20 +136,11 @@ cd code
 
 ```shell
 中国区县级 2m temperature 分区统计
-/data/ECMWF/zonal_statistics
-
-2m temperature
-
-t2m.csv
+/data/ECMWF/zonal_statistics/t2m.csv
 
 
 中国区县级 1000hPa relative humidity 分区统计
-/data/ECMWF/zonal_statistics
-
-1000hPa relative humidity
-
-rh.csv
-
+/data/ECMWF/zonal_statistics/rh.csv
 
 
 辅助文件：
