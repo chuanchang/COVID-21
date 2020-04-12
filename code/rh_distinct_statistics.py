@@ -12,29 +12,26 @@ import pandas as pd
 
 # 区县级rh数据统计
 def distinct_statistics(years, months, days, times, rh, pac_class_id):
-    cols = []
-
+    cols = list(rh)
     for year in years:
         for month in months:
             for day in days:
                 col = []
                 for time in times:
-                    col.append('rh' + '_' + year + month + day + '_' + time)
+                    if 'rh' + '_' + year + month + day + '_' + time in cols:
+                        col.append('rh' + '_' + year + month + day + '_' + time)
 
-                try:
-                    rh_temp = rh[col]
-                    cols.append(year + month + day)
-                    # 按行求和
-                    pac_class_id[year + month + day] = rh_temp.apply(lambda x: x.mean(), axis=1)
-                except:
-                    print(col)
+                rh_temp = rh[col]
+                # 按行求和
+                pac_class_id[year + month + day] = rh_temp.apply(lambda x: x.mean(), axis=1)
 
-    rh_temp = pac_class_id[cols]
+    distinct_rh = pac_class_id[['id']].copy()
+    pac_class_id = pac_class_id.dropna(axis=1).iloc[:, 2::]
 
-    distinct_rh = pac_class_id['id']
-    distinct_rh['rh_mean'] = rh_temp.apply(lambda x: x.mean(), axis=1)
-    distinct_rh['rh_max'] = rh_temp.apply(lambda x: x.max(), axis=1)
-    distinct_rh['rh_min'] = rh_temp.apply(lambda x: x.min(), axis=1)
+    distinct_rh.loc[:, 'rh_mean'] = pac_class_id.apply(lambda x: x.mean(), axis=1).to_list()
+    distinct_rh.loc[:, 'rh_max'] = pac_class_id.apply(lambda x: x.max(), axis=1).to_list()
+    distinct_rh.loc[:, 'rh_min'] = pac_class_id.apply(lambda x: x.min(), axis=1).to_list()
+
     distinct_rh.to_csv("../data/ECMWF/zonal_statistics/distinct_rh.csv", index=False)
 
 
@@ -43,11 +40,11 @@ if __name__ == '__main__':
 
     pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_id.csv", sep=',')
 
-    rh = pd.read_csv("../data/ECMWF/zonal_statistics/", sep=',')
+    rh = pd.read_csv("../data/ECMWF/zonal_statistics/rh.csv", sep=',')
 
     # year month day times
     years = ['2020']
-    months = ['01', '02', '03']
+    months = ['01', '02', '03', '04']
     days = ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',

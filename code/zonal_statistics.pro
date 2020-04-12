@@ -5,7 +5,7 @@ pro zonal_statistics
   mask = envi_get_data(fid=fid, dims=dims, pos=0)
   max_class = max(mask)
   
-  file = file_search('D:\try\', '*.tif', count=count)
+  file = file_search('D:\try2\', '*.tif', count=count)
   s = sort(file)
   
   res = make_array(count, max_class, /float)
@@ -29,5 +29,5 @@ pro zonal_statistics
     endfor
   endfor
   
-  write_csv, 'D:\1\rh.csv', res, header=header
+  write_csv, 'D:\1\t2m.csv', res, header=header
 end

@@ -12,29 +12,26 @@ import pandas as pd
 
 # 区县级rh数据统计
 def distinct_statistics(years, months, days, times, t2m, pac_class_id):
-    cols = []
-
+    cols = list(t2m)
     for year in years:
         for month in months:
             for day in days:
                 col = []
                 for time in times:
-                    col.append('t2m' + '_' + year + month + day + '_' + time)
+                    if 't2m' + '_' + year + month + day + '_' + time in cols:
+                        col.append('t2m' + '_' + year + month + day + '_' + time)
 
-                try:
-                    t2m_temp = t2m[col]
-                    cols.append(year + month + day)
-                    # 按行求和
-                    pac_class_id[year + month + day] = t2m_temp.apply(lambda x: x.mean(), axis=1)
-                except:
-                    pass
+                t2m_temp = t2m[col]
+                # 按行求和
+                pac_class_id[year + month + day] = t2m_temp.apply(lambda x: x.mean(), axis=1)
 
-    t2m_temp = pac_class_id[cols]
+    distinct_t2m = pac_class_id[['id']].copy()
+    pac_class_id = pac_class_id.dropna(axis=1).iloc[:, 2::]
 
-    distinct_t2m = pac_class_id['id']
-    distinct_t2m['t2m_mean'] = t2m_temp.apply(lambda x: x.mean(), axis=1)
-    distinct_t2m['t2m_max'] = t2m_temp.apply(lambda x: x.max(), axis=1)
-    distinct_t2m['t2m_min'] = t2m_temp.apply(lambda x: x.min(), axis=1)
+    distinct_t2m.loc[:, 't2m_mean'] = pac_class_id.apply(lambda x: x.mean(), axis=1).to_list()
+    distinct_t2m.loc[:, 't2m_max'] = pac_class_id.apply(lambda x: x.max(), axis=1).to_list()
+    distinct_t2m.loc[:, 't2m_min'] = pac_class_id.apply(lambda x: x.min(), axis=1).to_list()
+
     distinct_t2m.to_csv("../data/ECMWF/zonal_statistics/distinct_t2m.csv", index=False)
 
 
@@ -43,11 +40,11 @@ if __name__ == '__main__':
 
     pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_id.csv", sep=',')
 
-    t2m = pd.read_csv("../data/ECMWF/zonal_statistics/", sep=',')
+    t2m = pd.read_csv("../data/ECMWF/zonal_statistics/t2m.csv", sep=',')
 
     # year month day times
     years = ['2020']
-    months = ['01', '02', '03']
+    months = ['01', '02', '03', '04']
     days = ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',

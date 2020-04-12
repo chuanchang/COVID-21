@@ -2,14 +2,13 @@ pro netcdfToTiff
   
   file = file_search('D:\try\', '*.nc', count=count)
   s = sort(file)
-  print, file[s]
-  aaaaaaa
-  
+  file = file[s]
+
   for i=0, count-1 do begin
     nid = ncdf_open(file[i])
     
     ;read rh
-    rhid = ncdf_varid(nid, 'r')
+    rhid = ncdf_varid(nid, 't2m')
     ncdf_varget, nid, rhid, rh
     ncdf_attget, nid, rhid, 'scale_factor', scale_factor
     ncdf_attget, nid, rhid, 'add_offset', add_offset
@@ -23,9 +22,10 @@ pro netcdfToTiff
     
     filename = strsplit(file[i], '\', /extract)
     filename = strsplit(filename[-1], '.', /extract)
-    envi_write_envi_file, rh, out_name = 'D:\try\' + filename[0] + '.tif', map_info = map_info, /no_open
+    envi_write_envi_file, rh, out_name = 'D:\try2\' + filename[0] + '.tif', map_info = map_info, /no_open
     
     print, filename[0]
+    ncdf_close, nid
     
   endfor
 end

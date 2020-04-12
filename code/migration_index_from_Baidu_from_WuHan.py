@@ -33,6 +33,13 @@ def epidemic_migration(china_city, china_distinct, epidemicIds, years, months, d
     china_distinct_name = china_distinct['name'].to_list()
     distinct_name = set()
 
+    china_city_moveIn = china_city.copy()
+    china_city_moveOut = china_city.copy()
+
+    china_distinct_moveIn = china_distinct.copy()
+    china_distinct_moveOut = china_distinct.copy()
+
+
     for id in epidemicIds:
         moveOut, moveIn = move_migration_index(id)
 
@@ -41,38 +48,38 @@ def epidemic_migration(china_city, china_distinct, epidemicIds, years, months, d
                 for day in days:
 
                     date = year + month + day
-
-                    china_city[date + '_moveOut'] = 0
-                    china_city[date + '_moveIn'] = 0
-
-                    china_distinct[date + '_moveOut'] = 0
-                    china_distinct[date + '_moveIn'] = 0
-
                     url = 'http://huiyan.baidu.com/migration/cityrank.jsonp?dt=city&id=' + str(id) + '&type=move_out' + '&date=' + date
-                    try:
-                        city_data = requests.get(url).content.decode('utf-8')[3:-1]
-                        city_data = json.loads(city_data)['data']['list']
+                    city_data = requests.get(url).content.decode('utf-8')[3:-1]
+                    city_data = json.loads(city_data)['data']['list']
+
+                    if len(city_data)>0:
+                        china_city_moveOut[date + '_moveOut'] = 0
+                        china_city_moveIn[date + '_moveIn'] = 0
+
+                        china_distinct_moveOut[date + '_moveOut'] = 0
+                        china_distinct_moveIn[date + '_moveIn'] = 0
+
                         for i in range(len(city_data)):
                             name = city_data[i]['city_name']
                             value = city_data[i]['value']
 
                             if name in china_city_name:
-                                china_city.loc[china_city['name'] == name, date + '_moveOut'] = moveOut[date] * value
-                                china_city.loc[china_city['name'] == name, date + '_moveIn'] = moveIn[date] * value
+                                china_city_moveOut.loc[china_city_moveOut['name'] == name, date + '_moveOut'] = moveOut[date] * value
+                                china_city_moveIn.loc[china_city_moveIn['name'] == name, date + '_moveIn'] = moveIn[date] * value
 
                             elif name in china_distinct_name:
                                 distinct_name.add(name)
-                                china_distinct.loc[china_distinct['name'] == name, date + '_moveOut'] = moveOut[date] * value
-                                china_distinct.loc[china_distinct['name'] == name, date + '_moveIn'] = moveIn[date] * value
+                                china_distinct_moveOut.loc[china_distinct_moveOut['name'] == name, date + '_moveOut'] = moveOut[date] * value
+                                china_distinct_moveIn.loc[china_distinct_moveIn['name'] == name, date + '_moveIn'] = moveIn[date] * value
                             else:
                                 print(name)
-
-                    except:
+                    else:
                         print(url)
 
-    china_distinct = china_distinct[china_distinct['name'].isin(list(distinct_name))]
+    china_distinct_moveOut = china_distinct_moveOut[china_distinct_moveOut['name'].isin(list(distinct_name))]
+    china_distinct_moveIn = china_distinct_moveIn[china_distinct_moveIn['name'].isin(list(distinct_name))]
 
-    return china_city, china_distinct
+    return china_city_moveOut, china_city_moveIn, china_distinct_moveOut, china_distinct_moveIn
 
 
 # main
@@ -82,13 +89,13 @@ if __name__ == '__main__':
     china_location = pd.read_csv("../data/china_location_id_2015.csv", sep=',')
 
     # china city
-    china_city = china_location.loc[china_location['city'] == 1, ['id', 'location', 'province_id']]
-    china_city.columns = ['id', 'name', 'province_id']
+    china_city = china_location.loc[china_location['city'] == 1, ['city_baidu_id', 'location', 'province_id']]
+    china_city.columns = ['city_baidu_id', 'name', 'province_id']
     print("china city num: " + str(len(china_city)))
 
     # china distinct
-    china_distinct = china_location.loc[china_location['distinct'] == 1, ['id', 'location', 'province_id']]
-    china_distinct.columns = ['id', 'name', 'province_id']
+    china_distinct = china_location.loc[china_location['distinct'] == 1, ['city_baidu_id', 'location', 'province_id']]
+    china_distinct.columns = ['city_baidu_id', 'name', 'province_id']
 
     print("china distinct num: " + str(len(china_distinct)))
 
@@ -111,8 +118,26 @@ if __name__ == '__main__':
             '31']
 
     # migration
-    china_city, china_distinct = epidemic_migration(china_city, china_distinct, epidemicIds, years, months, days)
-    epidemic_distinct = pd.concat([china_city, china_distinct])
+    china_city_moveOut, china_city_moveIn, china_distinct_moveOut, china_distinct_moveIn = epidemic_migration(china_city, china_distinct, epidemicIds, years, months, days)
 
-    # city migration
-    epidemic_distinct.to_csv("../data/baidu_migration/city_migration_from_WuHan.csv", index=False)
+    # city migration out
+    epidemic_moveOut = pd.concat([china_city_moveOut, china_distinct_moveOut])
+    epidemic_moveOut.to_csv("../data/baidu_migration/city_migration_out_from_WuHan.csv", index=False)
+
+    # city migration In out
+    epidemic_moveOut_sum = epidemic_moveOut[['city_baidu_id', 'name', 'province_id']]
+    epidemic_moveOut = epidemic_moveOut.iloc[:, 3::]
+    epidemic_moveOut_sum['moveOut_sum'] = epidemic_moveOut.apply(lambda x: x.sum(), axis=1)
+    epidemic_moveOut_sum.to_csv("../data/baidu_migration/city_migration_out_from_WuHan_sum.csv", index=False)
+
+
+
+    # city migration In
+    epidemic_moveIn = pd.concat([china_city_moveIn, china_distinct_moveIn])
+    epidemic_moveIn.to_csv("../data/baidu_migration/city_migration_in_from_WuHan.csv", index=False)
+
+    # city migration In sum
+    epidemic_moveIn_sum = epidemic_moveIn[['city_baidu_id', 'name', 'province_id']]
+    epidemic_moveIn = epidemic_moveIn.iloc[:, 3::]
+    epidemic_moveIn_sum['moveIn_sum'] = epidemic_moveIn.apply(lambda x: x.sum(), axis=1)
+    epidemic_moveIn_sum.to_csv("../data/baidu_migration/city_migration_in_from_WuHan_sum.csv", index=False)

@@ -11,6 +11,7 @@
 import pandas as pd
 import json
 import requests
+import time
 
 # city 迁入迁徙规模指数
 def moveIn_migration_index(city_baidu_ids, years, months, days):
@@ -77,7 +78,8 @@ def travel_intensity(city_baidu_ids, years, months, days):
     travel = []
 
     for id in city_baidu_ids:
-        url = 'http://huiyan.baidu.com/migration/internalflowhistory.jsonp?dt=city&id=' + str(id) + '&date=20200408'
+        url = 'http://huiyan.baidu.com/migration/internalflowhistory.jsonp?dt=city&id=' + str(id) + '&date=' + time.strftime("%Y%m%d")
+
         try:
             city_data = requests.get(url).content.decode('utf-8')[3:-1]
             city_data = json.loads(city_data)['data']['list']
