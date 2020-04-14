@@ -30,8 +30,8 @@ def download(year, month, day, time):
 
 if __name__ == '__main__':
 
-    years = ['2019']
-    months = ['12']
+    years = ['2020']
+    months = ['01', '02', '03', '04']
     days = ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',

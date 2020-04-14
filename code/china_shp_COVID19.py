@@ -8,7 +8,7 @@
 import geopandas
 import pandas as pd
 
-'''
+
 """ 
 对中国2015的区县级shp文件加上 cityId 和 provinceId
 """
@@ -20,8 +20,10 @@ shp_df.rename(columns={'PAC': 'id'}, inplace=True)
 
 # 2015 China location id
 location_df = pd.read_csv('../data/china_location_id_2015.csv', sep=',')
+location_df = location_df[['id', 'location', 'province', 'city', 'distinct', 'city_id', 'province_id']]
+location_df.loc[(location_df['distinct']==1) & (location_df['city_id']==-999), 'city_id'] = location_df[(location_df['distinct']==1) & (location_df['city_id']==-999)]['id']
+
 location_df = location_df[['id', 'location', 'city_id', 'province_id']]
-location_df.columns = ['id', 'location', 'cityId', 'proId']
 
 city = location_df[['id', 'location']]
 city.columns = ['cityId', 'cityName']
@@ -30,12 +32,10 @@ province = location_df[['id', 'location']]
 province.columns = ['proId', 'proName']
 
 shp_df = pd.merge(shp_df, location_df, how='left', on='id')
-shp_df = pd.merge(shp_df, city, how='left', on='cityId')
-shp_df = pd.merge(shp_df, province, how='left', on='proId')
-
 shp_df.to_file("../shp/china_distinct.shp", encoding='utf-8')
+print(len(shp_df))
 aaaaaa
-'''
+
 
 
 
