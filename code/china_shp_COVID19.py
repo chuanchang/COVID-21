@@ -8,9 +8,33 @@
 import geopandas
 import pandas as pd
 
-
+'''
 """ 
 对中国2015的区县级shp文件加上 cityId 和 provinceId
+"""
+
+# 2015 China distinct shp
+path = '../shp/china_all_8_dissolve.shp'
+shp_df = geopandas.GeoDataFrame.from_file(path)
+shp_df.rename(columns={'PAC': 'id'}, inplace=True)
+
+
+# 2015 China location id
+location_df = pd.read_csv('../data/china_location_id_2015.csv', sep=',')
+location_df = location_df[['id', 'location', 'province', 'city', 'distinct', 'city_id', 'province_id']]
+
+
+location_df.loc[(location_df['distinct']==1) & (location_df['city_id']==-999), 'city_id'] = location_df[(location_df['distinct']==1) & (location_df['city_id']==-999)]['id']
+location_df = location_df[['id', 'location', 'city_id', 'province_id']]
+
+shp_df = pd.merge(shp_df, location_df, how='left', on='id')
+shp_df.to_file("../shp/china_distinct.shp", encoding='utf-8')
+print(len(shp_df))
+'''
+
+'''
+""" 
+输出中国的直辖市、地级市和省直辖区县
 """
 # 2015 China distinct shp
 path = '../shp/china_all_8_dissolve.shp'
@@ -21,22 +45,36 @@ shp_df.rename(columns={'PAC': 'id'}, inplace=True)
 # 2015 China location id
 location_df = pd.read_csv('../data/china_location_id_2015.csv', sep=',')
 location_df = location_df[['id', 'location', 'province', 'city', 'distinct', 'city_id', 'province_id']]
-location_df.loc[(location_df['distinct']==1) & (location_df['city_id']==-999), 'city_id'] = location_df[(location_df['distinct']==1) & (location_df['city_id']==-999)]['id']
 
-location_df = location_df[['id', 'location', 'city_id', 'province_id']]
 
-city = location_df[['id', 'location']]
-city.columns = ['cityId', 'cityName']
+city = location_df[location_df['city']==1]
 
-province = location_df[['id', 'location']]
-province.columns = ['proId', 'proName']
+distinct = location_df[(location_df['distinct']==1) & (location_df['city_id']==-999)]
 
-shp_df = pd.merge(shp_df, location_df, how='left', on='id')
-shp_df.to_file("../shp/china_distinct.shp", encoding='utf-8')
-print(len(shp_df))
+city_distinct = pd.concat([city, distinct])
+city_distinct = city_distinct[['id', 'location', 'city', 'distinct', 'province_id']]
+city_distinct.to_csv("../data/china_city_distinct_2018.csv", index=False)
+'''
+
+""" 
+输出中国的直辖市、地级市和省直辖区县
+"""
+# 2015 China distinct shp
+df = pd.read_csv('../data/ECMWF/zonal_statistics/pac_class_city_id.csv')
+
+id1 = df['id'].to_list()
+print(len(df))
+
+
+city_distinct = pd.read_csv("../data/china_city_distinct_2018.csv")
+print(len(city_distinct))
+
+id2 = city_distinct['id'].to_list()
+
+print(set(id2).difference(set(id1)))
+
+
 aaaaaa
-
-
 
 
 # 2015 China distinct shp

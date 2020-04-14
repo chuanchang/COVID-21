@@ -1,11 +1,11 @@
 pro zonal_statistics
 
-  envi_open_file, 'D:\1\class_id.tif', r_fid = fid, /invisible
+  envi_open_file, 'D:\1\class_city_id.tif', r_fid = fid, /invisible
   envi_file_query, fid, dims = dims
   mask = envi_get_data(fid=fid, dims=dims, pos=0)
   max_class = max(mask)
   
-  file = file_search('D:\try2\', '*.tif', count=count)
+  file = file_search('D:\try1\', '*.tif', count=count)
   s = sort(file)
   
   res = make_array(count, max_class, /float)
@@ -29,5 +29,5 @@ pro zonal_statistics
     endfor
   endfor
   
-  write_csv, 'D:\1\t2m.csv', res, header=header
+  write_csv, 'D:\1\city_rh.csv', res, header=header
 end

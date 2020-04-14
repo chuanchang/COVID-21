@@ -32,15 +32,15 @@ def distinct_statistics(years, months, days, times, rh, pac_class_id):
     distinct_rh.loc[:, 'rh_max'] = pac_class_id.apply(lambda x: x.max(), axis=1).to_list()
     distinct_rh.loc[:, 'rh_min'] = pac_class_id.apply(lambda x: x.min(), axis=1).to_list()
 
-    distinct_rh.to_csv("../data/ECMWF/zonal_statistics/distinct_rh.csv", index=False)
+    distinct_rh.to_csv("../data/ECMWF/zonal_statistics/city_rh_final.csv", index=False)
 
 
 # main
 if __name__ == '__main__':
 
-    pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_id.csv", sep=',')
+    pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_city_id.csv", sep=',')
 
-    rh = pd.read_csv("../data/ECMWF/zonal_statistics/rh.csv", sep=',')
+    rh = pd.read_csv("../data/ECMWF/zonal_statistics/city_rh.csv", sep=',')
 
     # year month day times
     years = ['2020']

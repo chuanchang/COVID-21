@@ -23,13 +23,13 @@ china_city = china_city[['id', 'location']]
 print("china city number: " + str(len(china_city)))
 
 
-china_distinct = china_location[(china_location['distinct']==1) and (china_location['city_id']==-999)]
+china_distinct = china_location[(china_location['distinct']==1) & (china_location['city_id']==-999)]
 china_distinct = china_distinct[['id', 'location']]
 print("china distinct number: " + str(len(china_distinct)))
 
 
-china_city_distinct = pd.concat([china_city, china_location])
-print("china city and distinct number: " + str(len(china_city) + len(china_distinct)))
+china_city_distinct = pd.concat([china_city, china_distinct])
+print("china city and distinct number: " + str(len(china_city_distinct)))
 
 
 # get data
@@ -39,13 +39,25 @@ covid_19_history_df = covid_19_history_df[['date', 'province', 'provinceCode', '
                                            'confirmed', 'cured', 'dead']]
 
 # 去除nan
-covid_19_history_df = covid_19_history_df.dropna()
+covid_19_history_df = covid_19_history_df.drop(covid_19_history_df[covid_19_history_df['province']==''].index)
+
+# province
+covid_19_history_province = covid_19_history_df[covid_19_history_df['city']=='']
+
+# city
+covid_19_history_city = covid_19_history_df[covid_19_history_df['city']!='']
 
 
+covid_19_history_province.to_csv("../output/COVID_history_province.csv", index=False)
+covid_19_history_city.to_csv("../output/COVID_history_city.csv", index=False)
+
+aaaaaa
 # 获取累计到2020-1-26的疫情数据
 date = '2020-1-26'
-covid_19_history_20200126 = covid_19_history_df[covid_19_history_df['date' == date]]
+covid_19_history_20200126 = covid_19_history_df[covid_19_history_df['date'] == date]
 print(len(covid_19_history_20200126))
+covid_19_history_20200126.to_csv("../output/COVID_history_before.csv", index=False)
+
 
 id = set(china_city_distinct['id'].to_list())
 print(len(id))

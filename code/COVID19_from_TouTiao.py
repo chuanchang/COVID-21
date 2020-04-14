@@ -170,12 +170,11 @@ def save_city(data, china_location):
 
     city = pd.DataFrame(city)
     city.columns = ['city_id', 'city_confirmedNum', 'city_deathsNum', 'city_curesNum', 'province_id']
-    city1 = pd.merge(china_province, china_city, how='inner', on="province_id")
-    city = pd.merge(city1, city, how='left', on=["city_id", "province_id"])
-    print("COVID-19 data city num: " + str(len(city)))
+    city = pd.merge(city, china_city, how='left', on=["city_id"])
     city = city.fillna(value=0)
     city[['city_confirmedNum', 'city_deathsNum', 'city_curesNum']] = city[['city_confirmedNum', 'city_deathsNum', 'city_curesNum']].astype(int)
     city.to_csv("../data/COVID19_city.csv", index=False)
+    print("COVID-19 data city num: " + str(len(city)))
     return city
 
 

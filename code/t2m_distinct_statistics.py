@@ -28,23 +28,26 @@ def distinct_statistics(years, months, days, times, t2m, pac_class_id):
     distinct_t2m = pac_class_id[['id']].copy()
     pac_class_id = pac_class_id.dropna(axis=1).iloc[:, 2::]
 
+    pac_class_id_before = pac_class_id[pac_class_id.columns <= '20200126']
+    print(pac_class_id_before)
+
     distinct_t2m.loc[:, 't2m_mean'] = pac_class_id.apply(lambda x: x.mean(), axis=1).to_list()
     distinct_t2m.loc[:, 't2m_max'] = pac_class_id.apply(lambda x: x.max(), axis=1).to_list()
     distinct_t2m.loc[:, 't2m_min'] = pac_class_id.apply(lambda x: x.min(), axis=1).to_list()
 
-    distinct_t2m.to_csv("../data/ECMWF/zonal_statistics/distinct_t2m.csv", index=False)
+    distinct_t2m.to_csv("../data/ECMWF/zonal_statistics/city_t2m_final.csv", index=False)
 
 
 # main
 if __name__ == '__main__':
 
-    pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_id.csv", sep=',')
+    pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_city_id.csv", sep=',')
 
-    t2m = pd.read_csv("../data/ECMWF/zonal_statistics/t2m.csv", sep=',')
+    t2m = pd.read_csv("../data/ECMWF/zonal_statistics/city_t2m.csv", sep=',')
 
     # year month day times
-    years = ['2020']
-    months = ['01', '02', '03', '04']
+    years = ['2019', '2020']
+    months = ['12', '01', '02', '03', '04']
     days = ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',
