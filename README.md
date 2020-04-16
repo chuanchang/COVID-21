@@ -136,11 +136,17 @@ zonal_statistics.pro
 
 ```shell
 中国区县级 2m temperature 分区统计
-/data/ECMWF/zonal_statistics/t2m.csv
-
+/data/ECMWF/zonal_statistics/distinct_t2m.csv
 
 中国区县级 1000hPa relative humidity 分区统计
-/data/ECMWF/zonal_statistics/rh.csv
+/data/ECMWF/zonal_statistics/distinct_rh.csv
+
+
+中国地级市 2m temperature 分区统计
+/data/ECMWF/zonal_statistics/city_t2m.csv
+
+中国地级市 1000hPa relative humidity 分区统计
+/data/ECMWF/zonal_statistics/city_rh.csv
 
 
 辅助文件：
@@ -148,23 +154,33 @@ zonal_statistics.pro
 中国区县级分类文件
 /data/ECMWF/zonal_statistics
 
-class_id.tif  class_id.hdr
+class_distinct_id.tif  class_distinct_id.hdr
 
 
 class_id.tif的每个像元值代表id，id与区县行政编码的对应文件
-pac_class_id.csv
+pac_class_distinct_id.csv
+
+
+中国地级市分类文件
+/data/ECMWF/zonal_statistics
+
+class_city_id.tif  class_city_id.hdr
+
+
+class_id.tif的每个像元值代表id，id与区县行政编码的对应文件
+pac_class_city_id.csv
 
 ```
 
-### ERA5数据区县级统计
+### ERA5数据累计值统计
 ```shell
 cd code
 
 # 2m temperature  1000hPa relative humidity
 
-python rh_distinct_statistics.py
+python rh_statistics.py
 
-python t2m_distinct_statistics.py
+python t2m_statistics.py
 ```
 
 ### 数据说明
@@ -172,9 +188,14 @@ python t2m_distinct_statistics.py
 ```shell
 中国区县级 2m temperature 1000hPa relative humidity 统计
 
-/data/ECMWF/zonal_statistics/distinct_t2m.csv
-/data/ECMWF/zonal_statistics/distinct_rh.csv
+/data/ECMWF/zonal_statistics/distinct_t2m_final.csv
+/data/ECMWF/zonal_statistics/distinct_rh_final.csv
 
+
+中国地级市 2m temperature 1000hPa relative humidity 统计
+
+/data/ECMWF/zonal_statistics/city_t2m_final.csv
+/data/ECMWF/zonal_statistics/city_rh_final.csv
 ```
 
 ## 百度迁徙数据获取
@@ -185,7 +206,7 @@ cd code
 # 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
 python migration_index_from_Baidu.py
 
-# 城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
+# 疫情城市迁入其他城市迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
 python migration_index_from_Baidu_from_WuHan.py
 ```
 

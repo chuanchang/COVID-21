@@ -47,8 +47,8 @@ def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
 
     moveIn = pd.DataFrame(moveIn)
     moveIn.columns = ['city_baidu_id', 'moveIn_index_sum', 'moveIn_index_max', 'moveIn_index_min',
-                      'moveIn_index_before_sum', 'moveIn_index_before_max', 'moveIn_index_before_min',
-                      'moveIn_index_after_sum', 'moveIn_index_after_max', 'moveIn_index_after_min']
+                      'moveIn_index_sum_before', 'moveIn_index_max_before', 'moveIn_index_min_before',
+                      'moveIn_index_sum_after', 'moveIn_index_max_after', 'moveIn_index_min_after']
 
     return moveIn
 
@@ -87,8 +87,8 @@ def moveOut_migration_index(city_baidu_ids, years, months, days, control_date):
 
     moveOut = pd.DataFrame(moveOut)
     moveOut.columns = ['city_baidu_id', 'moveOut_index_sum', 'moveOut_index_max', 'moveOut_index_min',
-                      'moveOut_index_before_sum', 'moveOut_index_before_max', 'moveOut_index_before_min',
-                      'moveOut_index_after_sum', 'moveOut_index_after_max', 'moveOut_index_after_min']
+                      'moveOut_index_sum_before', 'moveOut_index_max_before', 'moveOut_index_min_before',
+                      'moveOut_index_sum_after', 'moveOut_index_max_after', 'moveOut_index_min_after']
     return moveOut
 
 
@@ -127,8 +127,8 @@ def travel_intensity(city_baidu_ids, years, months, days, control_date):
 
     travel = pd.DataFrame(travel)
     travel.columns = ['city_baidu_id', 'travel_index_sum', 'travel_index_max', 'travel_index_min',
-                      'travel_index_before_sum', 'travel_index_before_max', 'travel_index_before_min',
-                      'travel_index_after_sum', 'travel_index_after_max', 'travel_index_after_min']
+                      'travel_index_sum_before', 'travel_index_max_before', 'travel_index_min_before',
+                      'travel_index_sum_after', 'travel_index_max_after', 'travel_index_min_after']
     return travel
 
 # main

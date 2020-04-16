@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     china_city_distinct['confirmed_after'] = china_city_distinct['confirmed'] - china_city_distinct['confirmed_before']
     china_city_distinct['cured_after'] = china_city_distinct['cured'] - china_city_distinct['cured_before']
-    china_city_distinct['cured_after'] = china_city_distinct['cured'] - china_city_distinct['cured_before']
+    china_city_distinct['dead_after'] = china_city_distinct['dead'] - china_city_distinct['dead_before']
     china_city_distinct = china_city_distinct.fillna(0)
     china_city_distinct.to_csv("../output/COVID_city_distinct.csv", index=False)
 

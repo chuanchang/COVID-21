@@ -69,7 +69,7 @@ if __name__ == '__main__':
     rh = pd.read_csv("../data/ECMWF/zonal_statistics/city_rh.csv", sep=',')
 
     # year month day times
-    years = ['2019', '2020']
+    years = ['2020']
     months = {'2019': ['12'], '2020': ['01', '02', '03', '04']}
     days = ['01', '02', '03',
             '04', '05', '06',

@@ -3,8 +3,8 @@
 
 """
 百度迁徙数据平台：http://qianxi.baidu.com/?from=baiduse
-
 爬取武汉迁入各个城市的比例和武汉的迁入和迁出迁徙指数，并计算乘积
+计算累计值、最大值和最小值
 """
 
 # load package
@@ -99,7 +99,8 @@ if __name__ == '__main__':
     print("china city num: " + str(len(china_city)))
 
     # china distinct
-    china_distinct = china_location.loc[china_location['distinct'] == 1, ['city_baidu_id', 'location', 'province_id']]
+    china_distinct = china_location.loc[(china_location['distinct'] == 1) & (china_location['city_id'] == -999),
+                                        ['city_baidu_id', 'location', 'province_id']]
     china_distinct.columns = ['city_baidu_id', 'name', 'province_id']
 
     print("china distinct num: " + str(len(china_distinct)))
@@ -129,18 +130,18 @@ if __name__ == '__main__':
     # migration
     china_city_moveOut, china_city_moveIn, china_distinct_moveOut, china_distinct_moveIn = epidemic_migration(china_city, china_distinct, epidemicIds, years, months, days)
 
-    # city migration out
+    # city migration In
     epidemic_moveOut = pd.concat([china_city_moveOut, china_distinct_moveOut])
     epidemic_moveOut.to_csv("../data/baidu_migration/city_migration_out_from_WuHan.csv", index=False)
 
-
-    # city migration out sum
+    # city migration In sum
     epidemic_moveOut_sum = epidemic_moveOut[['city_baidu_id', 'name', 'province_id']]
     epidemic_moveOut = epidemic_moveOut.iloc[:, 3::]
 
     for id in epidemicIds:
-        epidemic_moveOut_city = epidemic_moveOut.loc[:, (epidemic_moveOut.columns.values <= str(id) + '_' + time.strftime("%Y%m%d") + '_moveOut') &
-                                                          (epidemic_moveOut.columns.values >= str(id) + '_' + '20200101_moveOut')]
+        epidemic_moveOut_city = epidemic_moveOut.loc[:,
+                               (epidemic_moveOut.columns.values <= str(id) + '_' + time.strftime("%Y%m%d") + '_moveIn') &
+                               (epidemic_moveOut.columns.values >= str(id) + '_' + '20200101_moveIn')]
 
         epidemic_moveOut_before = epidemic_moveOut_city.loc[:, epidemic_moveOut_city.columns.values <= str(id) + '_' + control_date + '_moveOut']
         epidemic_moveOut_after = epidemic_moveOut_city.loc[:, epidemic_moveOut_city.columns.values > str(id) + '_' + control_date + '_moveOut']
@@ -149,9 +150,7 @@ if __name__ == '__main__':
         epidemic_moveOut_sum[str(id) + '_moveOut_sum_before'] = epidemic_moveOut_before.apply(lambda x: x.sum(), axis=1)
         epidemic_moveOut_sum[str(id) + '_moveOut_sum_after'] = epidemic_moveOut_after.apply(lambda x: x.sum(), axis=1)
 
-
     epidemic_moveOut_sum.to_csv("../data/baidu_migration/city_migration_out_from_WuHan_sum.csv", index=False)
-
 
 
     # city migration In
