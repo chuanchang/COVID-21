@@ -56,6 +56,7 @@ city_distinct = city_distinct[['id', 'location', 'city', 'distinct', 'province_i
 city_distinct.to_csv("../data/china_city_distinct_2018.csv", index=False)
 '''
 
+'''
 """ 
 输出中国的直辖市、地级市和省直辖区县
 """
@@ -75,6 +76,25 @@ print(set(id2).difference(set(id1)))
 
 
 aaaaaa
+'''
+
+
+df_all = pd.read_csv("../output/COVID_final.csv")
+print(len(df_all))
+
+# 2015 China city shp
+path = '../shp/china_city.shp'
+shp_city = geopandas.GeoDataFrame.from_file(path)
+shp_city.rename(columns={'city_id': 'id'}, inplace=True)
+print(len(shp_city))
+
+shp_city = pd.merge(shp_city, df_all, how='inner', on='id')
+shp_city = shp_city.fillna(value=0)
+shp_city.to_file("../shp/china_city_distinct_COVID19.shp", encoding='utf-8')
+print(len(shp_city))
+
+aaaaa
+
 
 
 # 2015 China distinct shp
@@ -85,6 +105,11 @@ shp_distinct = geopandas.GeoDataFrame.from_file(path)
 path = '../shp/china_city.shp'
 shp_city = geopandas.GeoDataFrame.from_file(path)
 shp_city.rename(columns={'cityId': 'id', 'cityName': 'location'}, inplace=True)
+print(len(shp_city))
+
+
+
+aaaaa
 
 # 2015 China province shp
 path = '../shp/china_province.shp'
