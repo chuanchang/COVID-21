@@ -75,10 +75,10 @@ def evaluation(real_y, prediction_y):
     plt.plot([0, 50000], [0, 50000], '--', color='black', label='', linewidth=1.0)
 
     ############# 设置坐标刻度值的大小以及刻度值的字体 #############
-    #plt.xlim(0, 2000)
-    #plt.ylim(0, 2000)
-    plt.xlim(0, 12)
-    plt.ylim(0, 12)
+    plt.xlim(0, 2000)
+    plt.ylim(0, 2000)
+    #plt.xlim(0, 12)
+    #plt.ylim(0, 12)
     plt.tick_params(labelsize=25)
 
     labels = ax.get_yticklabels()
@@ -254,10 +254,10 @@ if __name__ == '__main__':
          'travel_index_mean', 'travel_index_max', 'travel_index_min',
          '420100_moveIn_mean', '420100_moveIn_max', '420100_moveIn_min', 'npp']]
 
-    confirmed = df['confirmed'].to_list()
-    confirmed = [math.log(i+1) for i in confirmed]
-    df.loc[:, 'confirmed'] = confirmed
-    print(sorted(df['confirmed'].to_list()))
+    #confirmed = df['confirmed'].to_list()
+    #confirmed = [math.log(i+1) for i in confirmed]
+    #df.loc[:, 'confirmed'] = confirmed
+    #print(sorted(df['confirmed'].to_list()))
 
     '''
 
