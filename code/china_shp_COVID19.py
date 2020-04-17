@@ -80,7 +80,22 @@ aaaaaa
 
 
 df_all = pd.read_csv("../output/COVID_final.csv")
+df_all = df_all[['id',
+                 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
+                 'confirmed', 'cured', 'dead',
+                 'moveIn_index_sum', 'moveIn_index_max', 'moveIn_index_min',
+                 'moveOut_index_sum', 'moveOut_index_max', 'moveOut_index_min',
+                 'travel_index_sum', 'travel_index_max', 'travel_index_min',
+                 '420100_moveIn_sum', '420100_moveOut_sum']]
+df_all.columns = ['id',
+                 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
+                 'confirmed', 'cured', 'dead',
+                 'moveIn_sum', 'moveIn_max', 'moveIn_min',
+                 'moveOut_sum', 'moveOut_max', 'moveOut_min',
+                 'travel_sum', 'travel_max', 'travel_min',
+                 '420100_In', '420100_Out']
 print(len(df_all))
+
 
 # 2015 China city shp
 path = '../shp/china_city.shp'

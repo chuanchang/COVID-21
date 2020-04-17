@@ -12,6 +12,7 @@ import pandas as pd
 import json
 import requests
 import time
+import numpy as np
 
 # city 迁入迁徙规模指数
 def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
@@ -19,7 +20,7 @@ def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
     moveIn = []
 
     for id in city_baidu_ids:
-        url = 'http://huiyan.baidu.com/migration/historycurve.jsonp?dt=province&id=' + str(id) + '&type=move_in'
+        url = 'http://huiyan.baidu.com/migration/historycurve.jsonp?dt=city&id=' + str(id) + '&type=move_in'
         try:
             city_data = requests.get(url).content.decode('utf-8')[3:-1]
             city_data = json.loads(city_data)['data']['list']
@@ -39,16 +40,16 @@ def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
                         else:
                             print(year + month + day)
 
-            moveIn.append([id, sum(moveIn_index), max(moveIn_index), min(moveIn_index),
-                           sum(moveIn_index_before), max(moveIn_index_before), min(moveIn_index_before),
-                           sum(moveIn_index_after), max(moveIn_index_after), min(moveIn_index_after)])
+            moveIn.append([id, np.mean(moveIn_index), max(moveIn_index), min(moveIn_index),
+                           np.mean(moveIn_index_before), max(moveIn_index_before), min(moveIn_index_before),
+                           np.mean(moveIn_index_after), max(moveIn_index_after), min(moveIn_index_after)])
         except:
             pass
 
     moveIn = pd.DataFrame(moveIn)
-    moveIn.columns = ['city_baidu_id', 'moveIn_index_sum', 'moveIn_index_max', 'moveIn_index_min',
-                      'moveIn_index_sum_before', 'moveIn_index_max_before', 'moveIn_index_min_before',
-                      'moveIn_index_sum_after', 'moveIn_index_max_after', 'moveIn_index_min_after']
+    moveIn.columns = ['city_baidu_id', 'moveIn_index_mean', 'moveIn_index_max', 'moveIn_index_min',
+                      'moveIn_index_mean_before', 'moveIn_index_max_before', 'moveIn_index_min_before',
+                      'moveIn_index_mean_after', 'moveIn_index_max_after', 'moveIn_index_min_after']
 
     return moveIn
 
@@ -59,7 +60,7 @@ def moveOut_migration_index(city_baidu_ids, years, months, days, control_date):
     moveOut = []
 
     for id in city_baidu_ids:
-        url = 'http://huiyan.baidu.com/migration/historycurve.jsonp?dt=province&id=' + str(id) + '&type=move_out'
+        url = 'http://huiyan.baidu.com/migration/historycurve.jsonp?dt=city&id=' + str(id) + '&type=move_out'
         try:
             city_data = requests.get(url).content.decode('utf-8')[3:-1]
             city_data = json.loads(city_data)['data']['list']
@@ -73,22 +74,23 @@ def moveOut_migration_index(city_baidu_ids, years, months, days, control_date):
                         if year + month + day in city_data.keys():
                             moveOut_index.append(city_data[year + month + day])
                             if year + month + day >= control_date:
+
                                 moveOut_index_after.append(city_data[year + month + day])
                             else:
                                 moveOut_index_before.append(city_data[year + month + day])
                         else:
                             print(year + month + day)
 
-            moveOut.append([id, sum(moveOut_index), max(moveOut_index), min(moveOut_index),
-                           sum(moveOut_index_before), max(moveOut_index_before), min(moveOut_index_before),
-                           sum(moveOut_index_after), max(moveOut_index_after), min(moveOut_index_after)])
+            moveOut.append([id, np.mean(moveOut_index), max(moveOut_index), min(moveOut_index),
+                           np.mean(moveOut_index_before), max(moveOut_index_before), min(moveOut_index_before),
+                           np.mean(moveOut_index_after), max(moveOut_index_after), min(moveOut_index_after)])
         except:
             pass
 
     moveOut = pd.DataFrame(moveOut)
-    moveOut.columns = ['city_baidu_id', 'moveOut_index_sum', 'moveOut_index_max', 'moveOut_index_min',
-                      'moveOut_index_sum_before', 'moveOut_index_max_before', 'moveOut_index_min_before',
-                      'moveOut_index_sum_after', 'moveOut_index_max_after', 'moveOut_index_min_after']
+    moveOut.columns = ['city_baidu_id', 'moveOut_index_mean', 'moveOut_index_max', 'moveOut_index_min',
+                      'moveOut_index_mean_before', 'moveOut_index_max_before', 'moveOut_index_min_before',
+                      'moveOut_index_mean_after', 'moveOut_index_max_after', 'moveOut_index_min_after']
     return moveOut
 
 
@@ -107,28 +109,31 @@ def travel_intensity(city_baidu_ids, years, months, days, control_date):
             travel_index = []
             travel_index_before = []
             travel_index_after = []
+
             for year in years:
                 for month in months[year]:
                     for day in days:
                         if year + month + day in city_data.keys():
                             travel_index.append(city_data[year + month + day])
                             if year + month + day >= control_date:
+
                                 travel_index_after.append(city_data[year + month + day])
                             else:
+
                                 travel_index_before.append(city_data[year + month + day])
                         else:
                             print(year + month + day)
 
-            travel.append([id, sum(travel_index), max(travel_index), min(travel_index),
-                           sum(travel_index_before), max(travel_index_before), min(travel_index_before),
-                           sum(travel_index_after), max(travel_index_after), min(travel_index_after)])
+            travel.append([id, np.mean(travel_index), max(travel_index), min(travel_index),
+                           np.mean(travel_index_before), max(travel_index_before), min(travel_index_before),
+                           np.mean(travel_index_after), max(travel_index_after), min(travel_index_after)])
         except:
             pass
 
     travel = pd.DataFrame(travel)
-    travel.columns = ['city_baidu_id', 'travel_index_sum', 'travel_index_max', 'travel_index_min',
-                      'travel_index_sum_before', 'travel_index_max_before', 'travel_index_min_before',
-                      'travel_index_sum_after', 'travel_index_max_after', 'travel_index_min_after']
+    travel.columns = ['city_baidu_id', 'travel_index_mean', 'travel_index_max', 'travel_index_min',
+                      'travel_index_mean_before', 'travel_index_max_before', 'travel_index_min_before',
+                      'travel_index_mean_after', 'travel_index_max_after', 'travel_index_min_after']
     return travel
 
 # main
@@ -141,7 +146,7 @@ if __name__ == '__main__':
 
     # year month day
     years = ['2020']
-    months = {'2020': ['01', '02', '03', '04']}
+    months = {'2020': ['01', '02', '03']}
     days = ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',

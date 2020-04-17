@@ -4,7 +4,7 @@
 """
 AkShare平台 https://akshare.readthedocs.io/zh_CN/latest/data/event/event.html
 
-世界历史疫情数据，提取中国地级市的历史疫情数据，2019-12-1~2020-4-13
+世界历史疫情数据，提取中国地级市的历史疫情数据，2020-1-1~2020-3-31
 """
 
 # load package
@@ -94,19 +94,20 @@ if __name__ == '__main__':
     covid_19_history_all = pd.read_csv("../output/COVID_history_city.csv")
 
 
+
     # 获取累计到2020-1-26的疫情数据
     control_date = '2020-01-26'
     covid_19_history_before = covid_19_history_all[covid_19_history_all['date'] == control_date]
     covid_19_history_before = covid_19_history_before[['cityCode', 'confirmed', 'cured', 'dead']]
     covid_19_history_before.columns = ['id', 'confirmed_before', 'cured_before', 'dead_before']
-    print(control_date + ":" + str(len(covid_19_history_before)))
+    print(control_date + ": " + str(len(covid_19_history_before)))
 
 
     # 获取累计到今天的疫情数据
-    covid_19_history_after = covid_19_history_all[covid_19_history_all['date'] == time.strftime("%Y-%m-%d")]
+    covid_19_history_after = covid_19_history_all[covid_19_history_all['date'] == "2020-03-31"]
     covid_19_history_after = covid_19_history_after[['cityCode', 'confirmed', 'cured', 'dead']]
     covid_19_history_after.columns = ['id', 'confirmed', 'cured', 'dead']
-    print(time.strftime("%Y-%m-%d") + ":" + str(len(covid_19_history_after)))
+    print("2020-03-31: " + str(len(covid_19_history_after)))
 
     china_city_distinct = pd.merge(china_city_distinct, covid_19_history_before, how='left', on='id')
     china_city_distinct = pd.merge(china_city_distinct, covid_19_history_after, how='left', on='id')
@@ -115,5 +116,8 @@ if __name__ == '__main__':
     china_city_distinct['cured_after'] = china_city_distinct['cured'] - china_city_distinct['cured_before']
     china_city_distinct['dead_after'] = china_city_distinct['dead'] - china_city_distinct['dead_before']
     china_city_distinct = china_city_distinct.fillna(0)
+    china_city_distinct[['confirmed_before', 'cured_before', 'dead_before', 'confirmed', 'cured', 'dead', 'confirmed_after', 'cured_after', 'dead_after']] \
+        = china_city_distinct[['confirmed_before', 'cured_before', 'dead_before', 'confirmed', 'cured', 'dead', 'confirmed_after', 'cured_after', 'dead_after']].astype(int)
+
     china_city_distinct.to_csv("../output/COVID_city_distinct.csv", index=False)
 
