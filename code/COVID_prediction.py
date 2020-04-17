@@ -243,7 +243,8 @@ if __name__ == '__main__':
 
     df_all = pd.read_csv("../output/COVID_final.csv")
     df_all = shuffle(df_all)
-    #print(df_all.columns.values)
+    print(df_all.columns.values)
+    aaaaa
 
     epidemicIds = [420100]
 

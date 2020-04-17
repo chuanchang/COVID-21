@@ -80,20 +80,21 @@ aaaaaa
 
 
 df_all = pd.read_csv("../output/COVID_final.csv")
-df_all = df_all[['id',
+df_all = df_all[['id', 'location', 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
+         'confirmed', 'cured', 'dead',
+         'moveIn_index_mean', 'moveIn_index_max', 'moveIn_index_min',
+         'moveOut_index_mean', 'moveOut_index_max', 'moveOut_index_min',
+         'travel_index_mean', 'travel_index_max', 'travel_index_min',
+         '420100_moveIn_mean', '420100_moveIn_max', '420100_moveIn_min', 'npp']]
+df_all.columns = ['id', 'location',
                  'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
                  'confirmed', 'cured', 'dead',
-                 'moveIn_index_sum', 'moveIn_index_max', 'moveIn_index_min',
-                 'moveOut_index_sum', 'moveOut_index_max', 'moveOut_index_min',
-                 'travel_index_sum', 'travel_index_max', 'travel_index_min',
-                 '420100_moveIn_sum', '420100_moveOut_sum']]
-df_all.columns = ['id',
-                 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
-                 'confirmed', 'cured', 'dead',
-                 'moveIn_sum', 'moveIn_max', 'moveIn_min',
-                 'moveOut_sum', 'moveOut_max', 'moveOut_min',
-                 'travel_sum', 'travel_max', 'travel_min',
-                 '420100_In', '420100_Out']
+                 'moveIn_mean', 'moveIn_max', 'moveIn_min',
+                 'moveOut_mean', 'moveOut_max', 'moveOut_min',
+                 'travel_mean', 'travel_max', 'travel_min',
+                 '420100_mean', '420100_max', '420100_min', 'npp']
+
+df_all = df_all[~df_all['id'].isin(['371200', '710000'])] # 去除台湾和莱芜
 print(len(df_all))
 
 
