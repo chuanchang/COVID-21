@@ -7,6 +7,7 @@
 
 import geopandas
 import pandas as pd
+import math
 
 '''
 """ 
@@ -93,6 +94,10 @@ df_all.columns = ['id', 'location',
                  'moveOut_mean', 'moveOut_max', 'moveOut_min',
                  'travel_mean', 'travel_max', 'travel_min',
                  '420100_mean', '420100_max', '420100_min', 'npp']
+
+confirmed = df_all['confirmed'].to_list()
+confirmed = [math.log(i+1) for i in confirmed]
+df_all.loc[:, 'con_log'] = confirmed
 
 df_all = df_all[~df_all['id'].isin(['371200', '710000'])] # 去除台湾和莱芜
 print(len(df_all))

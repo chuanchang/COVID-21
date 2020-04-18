@@ -198,6 +198,28 @@ python t2m_statistics.py
 /data/ECMWF/zonal_statistics/city_rh_final.csv
 ```
 
+## 夜光数据NPP/VIIRS
+
+```shell script
+
+cd code
+
+# 夜光统计 ---- IDL
+
+zonal_statistics_light.pro
+
+```
+
+### 数据说明
+
+```shell
+
+中国地级市夜光分区统计结果
+
+/data/npp/city_npp.csv
+
+```
+
 ## 百度迁徙数据获取
 
 ```shell
