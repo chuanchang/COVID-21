@@ -31,12 +31,12 @@ def distinct_statistics(years, months, days, times, t2m, pac_class_id, control_d
                 # 按行求和
                 pac_class_id[year + month + day] = t2m_temp.apply(lambda x: x.mean(), axis=1)
 
-    pac_class_id.to_csv("../data/ECMWF/zonal_statistics/city_t2m_day.csv", index=False)
+    pac_class_id.to_csv("./data/ECMWF/zonal_statistics/city_t2m_day.csv", index=False)
 
     distinct_t2m = pac_class_id[['id']].copy()
 
     # 只保留特征值
-    pac_class_id = pac_class_id.dropna(axis=1).iloc[:, 2::]
+    pac_class_id = pac_class_id.iloc[:, 2::]
 
     # 管控日期之前
     pac_class_id_before = pac_class_id.loc[:, pac_class_id.columns.values <= control_date]
@@ -60,15 +60,15 @@ def distinct_statistics(years, months, days, times, t2m, pac_class_id, control_d
     distinct_t2m.loc[:, 't2m_min_after'] = pac_class_id_after.apply(lambda x: x.min(), axis=1).to_list()
 
     # 输出
-    distinct_t2m.to_csv("../data/ECMWF/zonal_statistics/city_t2m_final.csv", index=False)
+    distinct_t2m.to_csv("./data/ECMWF/zonal_statistics/city_t2m_final.csv", index=False)
 
 
 # main
 if __name__ == '__main__':
 
-    pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_city_id.csv", sep=',')
+    t2m = pd.read_csv("./data/ECMWF/zonal_statistics/city_t2m.csv", sep=',')
 
-    t2m = pd.read_csv("../data/ECMWF/zonal_statistics/city_t2m.csv", sep=',')
+    pac_class_id = t2m[['id']].copy()
 
     # year month day times
     years = ['2020']

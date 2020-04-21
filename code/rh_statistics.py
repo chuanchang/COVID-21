@@ -31,7 +31,7 @@ def distinct_statistics(years, months, days, times, rh, pac_class_id, control_da
                 # 按行求和
                 pac_class_id[year + month + day] = rh_temp.apply(lambda x: x.mean(), axis=1)
 
-    pac_class_id.to_csv("../data/ECMWF/zonal_statistics/city_rh_day.csv", index=False)
+    pac_class_id.to_csv("./data/ECMWF/zonal_statistics/city_rh_day.csv", index=False)
 
     distinct_rh = pac_class_id[['id']].copy()
 
@@ -60,15 +60,15 @@ def distinct_statistics(years, months, days, times, rh, pac_class_id, control_da
     distinct_rh.loc[:, 'rh_min_after'] = pac_class_id_after.apply(lambda x: x.min(), axis=1).to_list()
 
     # 输出
-    distinct_rh.to_csv("../data/ECMWF/zonal_statistics/city_rh_final.csv", index=False)
+    distinct_rh.to_csv("./data/ECMWF/zonal_statistics/city_rh_final.csv", index=False)
 
 
 # main
 if __name__ == '__main__':
 
-    pac_class_id = pd.read_csv("../data/ECMWF/zonal_statistics/pac_class_city_id.csv", sep=',')
-
-    rh = pd.read_csv("../data/ECMWF/zonal_statistics/city_rh.csv", sep=',')
+    rh = pd.read_csv("./data/ECMWF/zonal_statistics/city_rh.csv", sep=',')
+    
+    pac_class_id = rh[['id']].copy()
 
     # year month day times
     years = ['2020']

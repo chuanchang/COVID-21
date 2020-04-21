@@ -17,10 +17,10 @@ import os
 
 
 # city 迁入迁徙规模指数
-def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
+def moveIn_migration_index(china_city_distinct, years, months, days, control_date):
 
-    china_city_moveIn = pd.DataFrame(city_baidu_ids)
-    china_city_moveIn.columns = ['id']
+    china_city_moveIn = china_city_distinct.copy()
+    city_baidu_ids = china_city_distinct['city_baidu_id'].to_list()
 
     for id in city_baidu_ids:
 
@@ -33,7 +33,7 @@ def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
                 for month in months[year]:
                     for day in days:
                         if year + month + day in city_data.keys():
-                            china_city_moveIn.loc[china_city_moveIn['id'] == id, year + month + day + '_moveIn'] = city_data[year + month + day]
+                            china_city_moveIn.loc[china_city_moveIn['city_baidu_id'] == id, year + month + day + '_moveIn'] = city_data[year + month + day]
                         else:
                             print(year + month + day)
         except:
@@ -45,10 +45,10 @@ def moveIn_migration_index(city_baidu_ids, years, months, days, control_date):
 
 
 # city 迁出迁徙规模指数
-def moveOut_migration_index(city_baidu_ids, years, months, days, control_date):
+def moveOut_migration_index(china_city_distinct, years, months, days, control_date):
 
-    china_city_moveOut = pd.DataFrame(city_baidu_ids)
-    china_city_moveOut.columns = ['id']
+    china_city_moveOut = china_city_distinct.copy()
+    city_baidu_ids = china_city_distinct['city_baidu_id'].to_list()
 
     for id in city_baidu_ids:
 
@@ -61,7 +61,7 @@ def moveOut_migration_index(city_baidu_ids, years, months, days, control_date):
                 for month in months[year]:
                     for day in days:
                         if year + month + day in city_data.keys():
-                            china_city_moveOut.loc[china_city_moveOut['id'] == id, year + month + day + '_moveOut'] = city_data[year + month + day]
+                            china_city_moveOut.loc[china_city_moveOut['city_baidu_id'] == id, year + month + day + '_moveOut'] = city_data[year + month + day]
                         else:
                             print(year + month + day)
         except:
@@ -73,10 +73,10 @@ def moveOut_migration_index(city_baidu_ids, years, months, days, control_date):
 
 
 # city 城市出行强度
-def travel_intensity(city_baidu_ids, years, months, days, control_date):
+def travel_intensity(china_city_distinct, years, months, days, control_date):
 
-    china_city_travel = pd.DataFrame(city_baidu_ids)
-    china_city_travel.columns = ['id']
+    china_city_travel = china_city_distinct.copy()
+    city_baidu_ids = china_city_distinct['city_baidu_id'].to_list()
 
     for id in city_baidu_ids:
         url = 'http://huiyan.baidu.com/migration/internalflowhistory.jsonp?dt=city&id=' + str(id) + '&date=' + time.strftime("%Y%m%d")
@@ -89,7 +89,7 @@ def travel_intensity(city_baidu_ids, years, months, days, control_date):
                 for month in months[year]:
                     for day in days:
                         if year + month + day in city_data.keys():
-                            china_city_travel.loc[china_city_travel['id'] == id, year + month + day + '_travel'] = city_data[year + month + day]
+                            china_city_travel.loc[china_city_travel['city_baidu_id'] == id, year + month + day + '_travel'] = city_data[year + month + day]
                         else:
                             print(year + month + day)
         except:
@@ -107,8 +107,21 @@ if __name__ == '__main__':
 
     # China location id
     china_location = pd.read_csv(os.path.join(path, "data/china_location_id_2015.csv"))
-    city_baidu_ids = list(set(china_location['city_baidu_id'].to_list()))
-    print(len(city_baidu_ids))
+
+    # china city
+    china_city = china_location.loc[china_location['city'] == 1, ['city_baidu_id', 'location', 'id']]
+    china_city.columns = ['city_baidu_id', 'name', 'id']
+    print("china city num: " + str(len(china_city)))
+
+    # china distinct
+    china_distinct = china_location.loc[(china_location['distinct'] == 1) & (china_location['city_id'] == -999),
+                                        ['city_baidu_id', 'location', 'id']]
+    china_distinct.columns = ['city_baidu_id', 'name', 'id']
+
+    print("china distinct num: " + str(len(china_distinct)))
+
+    china_city_distinct = pd.concat([china_city, china_distinct])
+    print("china city and distinct number: " + str(len(china_city_distinct)))
 
     # year month day
     years = ['2020']
@@ -128,35 +141,29 @@ if __name__ == '__main__':
     control_date = '20200126'
 
     # city moveIn moveOut travel
-    moveIn = moveIn_migration_index(city_baidu_ids, years, months, days, control_date)
+    moveIn = moveIn_migration_index(china_city_distinct, years, months, days, control_date)
     print("china city moveIn: " + str(len(moveIn)))
 
-    moveOut = moveOut_migration_index(city_baidu_ids, years, months, days, control_date)
+    moveOut = moveOut_migration_index(china_city_distinct, years, months, days, control_date)
     print("china city moveOut: " + str(len(moveOut)))
 
-    travel = travel_intensity(city_baidu_ids, years, months, days, control_date)
+    travel = travel_intensity(china_city_distinct, years, months, days, control_date)
     print("china city travel: " + str(len(travel)))
-
-
-    id1 = moveIn['id'].to_list()
-    id2 = moveOut['id'].to_list()
-    id3 = travel['id'].to_list()
-
-    print(list(set(city_baidu_ids).difference(set(id1))))
-    print(list(set(city_baidu_ids).difference(set(id2))))
-    print(list(set(city_baidu_ids).difference(set(id3))))
     
     # city migration moveIn
     city_moveIn = moveIn[['id']].copy()
 
     # 只保留特征值
-    moveIn = moveIn.dropna(axis=1).iloc[:, 1::]
+    moveIn = moveIn.iloc[:, 3::]
 
     # 管控日期之前
     moveIn_before = moveIn.loc[:, moveIn.columns.values <= control_date + '_moveIn']
 
     # 管控日期之后
     moveIn_after = moveIn.loc[:, moveIn.columns.values > control_date + '_moveIn']
+
+    print(moveIn_before)
+    print(moveIn_after)
 
     # 整个时间段
     city_moveIn.loc[:, 'moveIn_index_mean'] = moveIn.apply(lambda x: x.mean(), axis=1).to_list()
@@ -174,12 +181,11 @@ if __name__ == '__main__':
     city_moveIn.loc[:, 'moveIn_index_min_after'] = moveIn_after.apply(lambda x: x.min(), axis=1).to_list()
 
 
-
     # city migration moveOut
     city_moveOut = moveOut[['id']].copy()
 
     # 只保留特征值
-    moveOut = moveOut.dropna(axis=1).iloc[:, 1::]
+    moveOut = moveOut.iloc[:, 3::]
 
     # 管控日期之前
     moveOut_before = moveOut.loc[:, moveOut.columns.values <= control_date + '_moveOut']
@@ -206,7 +212,7 @@ if __name__ == '__main__':
     city_travel = travel[['id']].copy()
 
     # 只保留特征值
-    travel = travel.dropna(axis=1).iloc[:, 1::]
+    travel = travel.iloc[:, 3::]
 
     # 管控日期之前
     travel_before = travel.loc[:, travel.columns.values <= control_date + '_travel']

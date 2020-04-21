@@ -5,6 +5,7 @@
 整合所有的特征和疫情数据，利用随机森林等机器学方法建模预测
 """
 
+# load package
 import pandas as pd
 from sklearn.utils import shuffle
 from sklearn.ensemble import RandomForestRegressor
@@ -145,59 +146,93 @@ def covid_all_predict(df):
 
 def get_feature_final():
     # 1000 hPa relative humidity
-    rh = pd.read_csv("../data/ECMWF/zonal_statistics/city_rh_final.csv")
+    rh = pd.read_csv("./data/ECMWF/zonal_statistics/city_rh_final.csv")
 
     # 2m temperature
-    t2m = pd.read_csv("../data/ECMWF/zonal_statistics/city_t2m_final.csv")
+    t2m = pd.read_csv("./data/ECMWF/zonal_statistics/city_t2m_final.csv")
 
     # npp
-    npp = pd.read_csv("../data/npp/city_npp.csv")
+    npp = pd.read_csv("./data/npp/city_npp.csv")
 
     # rh t2m npp
     df_all = pd.merge(rh, t2m, how='inner', on='id')
     df_all = pd.merge(df_all, npp, how='left', on='id')
 
-
     # covid
-    covid = pd.read_csv("../output/COVID_city_distinct.csv")
+    covid = pd.read_csv("./output/COVID_city_distinct.csv")
 
     # merge covid 缺失表示无疫情相关，用0替代
     df_all = pd.merge(df_all, covid, how='left', on='id')
     df_all = df_all.fillna(0)
 
-    # add city_baidu_id
-    china_location_id = pd.read_csv("../data/china_location_id_2015.csv")
-    china_location_id = china_location_id[['id', 'city_baidu_id']]
-    df_all = pd.merge(df_all, china_location_id, how='left', on='id')
-
-
     # 增加迁入迁徙规模指数、迁出迁徙规模指数和城内出行强度
-    moveIn = pd.read_csv("../data/baidu_migration/city_migration.csv")
-    df_all = pd.merge(df_all, moveIn, how='left', on='city_baidu_id')
+    moveIn = pd.read_csv("./data/baidu_migration/city_migration.csv")
+    df_all = pd.merge(df_all, moveIn, how='left', on='id')
     df_all = df_all.fillna(0)
-
 
     # add moveOut from Wuhan
-    moveIn_sum = pd.read_csv("../data/baidu_migration/city_migration_in_from_WuHan_sum.csv")
-    moveIn_sum = moveIn_sum.drop(['name', 'province_id'], axis=1)
-    df_all = pd.merge(df_all, moveIn_sum, how='left', on='city_baidu_id')
+    moveIn_sum = pd.read_csv("./data/baidu_migration/city_move_in_from_WuHan_sum.csv")
+    moveIn_sum = moveIn_sum.drop(['name', 'city_baidu_id'], axis=1)
+    df_all = pd.merge(df_all, moveIn_sum, how='left', on='id')
     df_all = df_all.fillna(0)
     df_all = df_all.drop_duplicates()
+
+    # 去除台湾、香港和澳门
+    df_all = df_all[~df_all['id'].isin(['710000', '810000', '820000'])]
+
+    temp = df_all['confirmed'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'confirmed_log'] = temp
+
+    temp = df_all['cured'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'cured_log'] = temp
+    
+    temp = df_all['dead'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'dead_log'] = temp
+
+
+    temp = df_all['confirmed_before'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'confirmed_before_log'] = temp
+
+    temp = df_all['cured_before'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'cured_before_log'] = temp
+    
+    temp = df_all['dead_before'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'dead_before_log'] = temp
+
+    temp = df_all['confirmed_after'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'confirmed_after_log'] = temp
+
+    temp = df_all['cured_after'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'cured_after_log'] = temp
+    
+    temp = df_all['dead_after'].to_list()
+    temp = [math.log(i+1) for i in temp]
+    df_all.loc[:, 'dead_after_log'] = temp
 
     import collections
     print([item for item, count in collections.Counter(df_all['id']).items() if count > 1])
 
-    df_all.to_csv("../output/COVID_final.csv", index=False)
+    df_all.to_csv("./output/COVID_final.csv", index=False)
 
 
 # main
 if __name__ == '__main__':
 
-    #get_feature_final()
+    # 整合特征
+    get_feature_final()
+    aaaaa
 
-    df_all = pd.read_csv("/Users/shaoqi/Desktop/COVID-19/output/COVID_final.csv")
-    df_all = df_all[~df_all['id'].isin(['371200', '710000', '810000'])]  # 去除台湾、香港和莱芜
+    df_all = pd.read_csv("./output/COVID_final.csv")
     df_all = shuffle(df_all)
+
     for i in df_all.columns.values:
         print(i)
 
@@ -218,7 +253,7 @@ if __name__ == '__main__':
 
     # epidemic id 疫情灾区id，暂定武汉
     epidemicIds = [420100]
-    df = df[~df['id'].isin(epidemicIds)]
+    #df = df[~df['id'].isin(epidemicIds)]
     covid_all_predict(df)
 
     aaaaaa

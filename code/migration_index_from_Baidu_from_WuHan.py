@@ -113,13 +113,13 @@ def epidemic_migration_proportion(china_city_distinct, epidemicIds, years, month
                             name = city_data[i]['city_name']
                             value = city_data[i]['value'] 
 
-                            if name in china_city__distinct_name:
-                                china_city_distinct_moveIn_from_Wuhan.loc[china_city_moveIn_from_Wuhan['name'] == name, str(id) + '_' + date + '_moveIn'] = value
+                            if name in china_city_distinct_name:
+                                china_city_distinct_moveIn_from_Wuhan.loc[china_city_distinct_moveIn_from_Wuhan['name'] == name, str(id) + '_' + date + '_moveIn'] = value
 
                             else:
                                 print(name)
 
-                        china_city_moveIn_from_Wuhan.loc[china_city_moveIn_from_Wuhan['city_baidu_id'] == id, str(id) + '_' + date + '_moveIn'] = 100
+                        china_city_distinct_moveIn_from_Wuhan.loc[china_city_distinct_moveIn_from_Wuhan['city_baidu_id'] == id, str(id) + '_' + date + '_moveIn'] = 100
 
                     else:
                         print(url)
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     path = os.path.realpath(os.curdir)
 
     # China location id
-    china_location = pd.read_csv(os.path.join(path, "data/china_location_id_2015.csv"))
+    china_location = pd.read_csv("../data/china_location_id_2015.csv")
 
     # china city
     china_city = china_location.loc[china_location['city'] == 1, ['city_baidu_id', 'location', 'id']]
@@ -173,11 +173,11 @@ if __name__ == '__main__':
 
     # migration
     china_city_distinct_moveIn_from_Wuhan = epidemic_migration_proportion(china_city_distinct, epidemicIds, years, months, days)
-    china_city_distinct_moveIn_from_Wuhan.to_csv(os.path.join(path, "data/baidu_migration/city_migration_in_from_WuHan.csv"), index=False)
+    china_city_distinct_moveIn_from_Wuhan.to_csv("../data/baidu_migration/city_move_in_from_WuHan.csv", index=False)
 
     # city migration In sum
-    epidemic_moveIn_sum = epidemic_moveIn[['id', 'name', 'city_baidu_id']]
-    epidemic_moveIn = epidemic_moveIn.iloc[:, 3::]
+    epidemic_moveIn_sum = china_city_distinct_moveIn_from_Wuhan[['id', 'name', 'city_baidu_id']].copy()
+    epidemic_moveIn = china_city_distinct_moveIn_from_Wuhan.iloc[:, 3::]
 
     for id in epidemicIds:
         epidemic_moveIn_city = epidemic_moveIn.loc[:,
@@ -189,19 +189,19 @@ if __name__ == '__main__':
         epidemic_moveIn_after = epidemic_moveIn_city.loc[:,
                                 epidemic_moveIn_city.columns.values > str(id) + '_' + control_date + '_moveIn']
 
-        epidemic_moveIn_sum[str(id) + '_moveIn_mean'] = epidemic_moveIn_city.apply(lambda x: x.mean(), axis=1)
-        epidemic_moveIn_sum[str(id) + '_moveIn_mean_before'] = epidemic_moveIn_before.apply(lambda x: x.mean(), axis=1)
-        epidemic_moveIn_sum[str(id) + '_moveIn_mean_after'] = epidemic_moveIn_after.apply(lambda x: x.mean(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_mean'] = epidemic_moveIn_city.apply(lambda x: x.mean(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_mean_before'] = epidemic_moveIn_before.apply(lambda x: x.mean(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_mean_after'] = epidemic_moveIn_after.apply(lambda x: x.mean(), axis=1)
 
-        epidemic_moveIn_sum[str(id) + '_moveIn_max'] = epidemic_moveIn_city.apply(lambda x: x.max(), axis=1)
-        epidemic_moveIn_sum[str(id) + '_moveIn_max_before'] = epidemic_moveIn_before.apply(lambda x: x.max(), axis=1)
-        epidemic_moveIn_sum[str(id) + '_moveIn_max_after'] = epidemic_moveIn_after.apply(lambda x: x.max(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_max'] = epidemic_moveIn_city.apply(lambda x: x.max(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_max_before'] = epidemic_moveIn_before.apply(lambda x: x.max(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_max_after'] = epidemic_moveIn_after.apply(lambda x: x.max(), axis=1)
 
-        epidemic_moveIn_sum[str(id) + '_moveIn_min'] = epidemic_moveIn_city.apply(lambda x: x.min(), axis=1)
-        epidemic_moveIn_sum[str(id) + '_moveIn_min_before'] = epidemic_moveIn_before.apply(lambda x: x.min(), axis=1)
-        epidemic_moveIn_sum[str(id) + '_moveIn_min_after'] = epidemic_moveIn_after.apply(lambda x: x.min(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_min'] = epidemic_moveIn_city.apply(lambda x: x.min(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_min_before'] = epidemic_moveIn_before.apply(lambda x: x.min(), axis=1)
+        epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_min_after'] = epidemic_moveIn_after.apply(lambda x: x.min(), axis=1)
 
-    epidemic_moveIn_sum.to_csv(os.path.join(path, "data/baidu_migration/city_migration_in_from_WuHan_sum.csv"), index=False)
+    epidemic_moveIn_sum.to_csv("../data/baidu_migration/city_move_in_from_WuHan_sum.csv", index=False)
 
     '''
     # migration
