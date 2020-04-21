@@ -21,6 +21,7 @@ def download(year, month, day, time):
                 'time': [time],
                 'format': 'netcdf',
                 'area': [54, 73, 18, 136],
+                'grid': [0.25, 0.25]
             },
             '../data/ECMWF/t2m/nc/t2m_' + year + month + day + '_' + time.replace(':', '') + '.nc')
         print('t2m_' + year + month + day + '_' + time + '.nc')

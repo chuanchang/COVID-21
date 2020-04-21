@@ -9,17 +9,19 @@ import geopandas
 import pandas as pd
 import math
 
-'''
+
 """ 
 对中国2015的区县级shp文件加上 cityId 和 provinceId
 """
 
 # 2015 China distinct shp
-path = '../shp/china_all_8_dissolve.shp'
+path = '/Users/shaoqi/Desktop/COVID-19/shp/china_all_8_dissolve.shp'
 shp_df = geopandas.GeoDataFrame.from_file(path)
 shp_df.rename(columns={'PAC': 'id'}, inplace=True)
 
-
+print(shp_df)
+aaaaaa
+'''
 # 2015 China location id
 location_df = pd.read_csv('../data/china_location_id_2015.csv', sep=',')
 location_df = location_df[['id', 'location', 'province', 'city', 'distinct', 'city_id', 'province_id']]
@@ -81,12 +83,51 @@ aaaaaa
 
 
 df_all = pd.read_csv("../output/COVID_final.csv")
+for i in df_all.columns.values:
+    print(i)
+
+'''
 df_all = df_all[['id', 'location', 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
          'confirmed', 'cured', 'dead',
          'moveIn_index_mean', 'moveIn_index_max', 'moveIn_index_min',
          'moveOut_index_mean', 'moveOut_index_max', 'moveOut_index_min',
          'travel_index_mean', 'travel_index_max', 'travel_index_min',
          '420100_moveIn_mean', '420100_moveIn_max', '420100_moveIn_min', 'npp']]
+df_all.columns = ['id', 'location',
+                 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
+                 'confirmed', 'cured', 'dead',
+                 'moveIn_mean', 'moveIn_max', 'moveIn_min',
+                 'moveOut_mean', 'moveOut_max', 'moveOut_min',
+                 'travel_mean', 'travel_max', 'travel_min',
+                 '420100_mean', '420100_max', '420100_min', 'npp']
+df_all = df_all[['id', 'location',
+                 'rh_mean_before','rh_max_before','rh_min_before',
+                 't2m_mean_before','t2m_max_before','t2m_min_before',
+                 'confirmed_before','cured_before','dead_before',
+                 'moveIn_index_mean_before','moveIn_index_max_before','moveIn_index_min_before',
+                 'moveOut_index_mean_before','moveOut_index_max_before','moveOut_index_min_before',
+                 'travel_index_mean_before','travel_index_max_before','travel_index_min_before',
+                 '420100_moveIn_mean_before','420100_moveIn_max_before','420100_moveIn_min_before', 'npp']]
+
+df_all.columns = ['id', 'location',
+                 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
+                 'confirmed', 'cured', 'dead',
+                 'moveIn_mean', 'moveIn_max', 'moveIn_min',
+                 'moveOut_mean', 'moveOut_max', 'moveOut_min',
+                 'travel_mean', 'travel_max', 'travel_min',
+                 '420100_mean', '420100_max', '420100_min', 'npp']
+
+
+'''
+df_all = df_all[['id', 'location',
+                 'rh_mean_after', 'rh_max_after', 'rh_min_after',
+                 't2m_mean_after', 't2m_max_after', 't2m_min_after',
+                 'confirmed_after', 'cured_after', 'dead_after',
+                 'moveIn_index_mean_after', 'moveIn_index_max_after', 'moveIn_index_min_after',
+                 'moveOut_index_mean_after', 'moveOut_index_max_after', 'moveOut_index_min_after',
+                 'travel_index_mean_after', 'travel_index_max_after', 'travel_index_min_after',
+                 '420100_moveIn_mean_after', '420100_moveIn_max_after', '420100_moveIn_min_after', 'npp']]
+
 df_all.columns = ['id', 'location',
                  'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
                  'confirmed', 'cured', 'dead',
@@ -111,7 +152,7 @@ print(len(shp_city))
 
 shp_city = pd.merge(shp_city, df_all, how='inner', on='id')
 shp_city = shp_city.fillna(value=0)
-shp_city.to_file("../shp/china_city_distinct_COVID19.shp", encoding='utf-8')
+shp_city.to_file("../shp/china_city_distinct_COVID19_after.shp", encoding='utf-8')
 print(len(shp_city))
 
 aaaaa

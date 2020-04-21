@@ -31,6 +31,8 @@ def distinct_statistics(years, months, days, times, rh, pac_class_id, control_da
                 # 按行求和
                 pac_class_id[year + month + day] = rh_temp.apply(lambda x: x.mean(), axis=1)
 
+    pac_class_id.to_csv("../data/ECMWF/zonal_statistics/city_rh_day.csv", index=False)
+
     distinct_rh = pac_class_id[['id']].copy()
 
     # 只保留特征值

@@ -13,26 +13,8 @@ from sklearn.metrics import mean_absolute_error #平方绝对误差
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import KFold
-#import catboost as cb
 import scipy
 import math
-
-
-# feature box 特征箱型图
-def feature_box(df, feature):
-    for i in feature:
-        print(i)
-        #df[i].plot(kind='box')
-        df.plot.scatter(x=i, y='confirmed_log')
-
-        plt.show()
-
-        # rmse  mae r2
-        slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(df[i], df['confirmed'])
-        print("R-squared", r_value ** 2)
-        print("R", r_value)
-
-    aaaaa
 
 
 # feature importance 特征重要性
@@ -66,19 +48,15 @@ def evaluation(real_y, prediction_y):
     print("rmse", rmse)
 
 
-    figsize = 12, 9
+    figsize = 12, 8
     figure, ax = plt.subplots(figsize=figsize)
-    color = ['limegreen', 'mediumslateblue', 'dodgerblue', 'darkorange']
-    marker = ['X', 'o', 'd', '<']
 
-    plt.scatter(real_y, prediction_y, c=color[0], marker=marker[1], label='', s=100, alpha=0.7, zorder=20)
+    plt.scatter(real_y, prediction_y, c='g', marker='o', label='', s=20, alpha=0.7, zorder=20)
     plt.plot([0, 50000], [0, 50000], '--', color='black', label='', linewidth=1.0)
 
     ############# 设置坐标刻度值的大小以及刻度值的字体 #############
-    plt.xlim(0, 2000)
-    plt.ylim(0, 2000)
-    #plt.xlim(0, 12)
-    #plt.ylim(0, 12)
+    plt.xlim(0, 4000)
+    plt.ylim(0, 4000)
     plt.tick_params(labelsize=25)
 
     labels = ax.get_yticklabels()
@@ -100,7 +78,7 @@ def evaluation(real_y, prediction_y):
     plt.show()
 
 
-# 所有城市疫情建模
+# 全时间段疫情建模
 def covid_all_predict(df):
 
     real_y = []
@@ -120,72 +98,50 @@ def covid_all_predict(df):
         train_df = df.iloc[index[i][0], :]
         test_df = df.iloc[index[i][1], :]
 
+        train_y_log = train_df['confirmed_log']
         train_y = train_df['confirmed']
-        #train_y = train_df['confirmed_before']
-        #train_y = train_df['confirmed_after']
 
-        #train_y = train_df['dead']
-        train_x = train_df.drop(['id', 'location', 'confirmed', 'cured', 'dead'], axis=1)
-        #train_x = train_df.drop(['id', 'location', 'confirmed_before', 'cured_before', 'dead_before'], axis=1)
-        #train_x = train_df.drop(['id', 'location', 'confirmed_after', 'cured_after', 'dead_after'], axis=1)
-
+        train_x = train_df.drop(['id', 'location', 'confirmed_log', 'confirmed', 'cured', 'dead'], axis=1)
 
         test_y = test_df['confirmed']
-        #test_y = test_df['confirmed_before']
-        #test_y = test_df['confirmed_after']
-        #test_y = test_df['dead']
-        test_x = test_df.drop(['id', 'location', 'confirmed', 'cured', 'dead'], axis=1)
-        #test_x = test_df.drop(['id', 'location', 'confirmed_before', 'cured_before', 'dead_before'], axis=1)
-        #test_x = test_df.drop(['id', 'location', 'confirmed_after', 'cured_after', 'dead_after'], axis=1)
+        test_x = test_df.drop(['id', 'location', 'confirmed_log', 'confirmed', 'cured', 'dead'], axis=1)
 
+        clf[i].fit(train_x, train_y_log)
 
-        clf[i].fit(train_x, train_y)
-        predict_y = clf[i].predict(test_x)
+        predict_ytrain_log = clf[i].predict(train_x)
+        predict_ytrain = np.trunc(np.exp(predict_ytrain_log) - 1)
+
+        predict_ytest_log = clf[i].predict(test_x)
+        predict_ytest = np.trunc(np.exp(predict_ytest_log) - 1)
 
         real_y.extend(test_y)
-        prediction_y.extend(predict_y)
+        prediction_y.extend(predict_ytest)
 
         print("train fold " + str(i+1))
-        evaluation(train_y, clf[i].predict(train_x))
+        evaluation(train_y, predict_ytrain)
 
         print("test fold " + str(i+1))
-        evaluation(test_y, predict_y)
+        evaluation(test_y, predict_ytest)
 
 
     print("************* cv evaluation ***************")
     evaluation(real_y, prediction_y)
 
-    aaaaa
+    for i, j in zip(real_y, prediction_y):
+        if abs(i-j)>100:
+            print(i, j)
 
     # feature importance
-    train_y = df['confirmed']
-    #train_y = df['confirmed_before']
-    #train_y = df['confirmed_after']
-    # train_y = train_df['dead']
-    train_x = df.drop(['id', 'location', 'confirmed', 'cured', 'dead'], axis=1)
-    #train_x = df.drop(['id', 'location', 'confirmed_before', 'cured_before', 'dead_before'], axis=1)
-    #train_x = df.drop(['id', 'location', 'confirmed_after', 'cured_after', 'dead_after'], axis=1)
+    train_y = df['confirmed_log']
+    train_x = df.drop(['id', 'location', 'confirmed_log', 'confirmed', 'cured', 'dead'], axis=1)
 
-
-    clf = RandomForestRegressor(n_estimators=10)
+    clf = RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5)
     clf.fit(train_x, train_y)
 
     features = list(train_x)
     importances = clf.feature_importances_
     indices = np.argsort(importances)
     feture_importance(features, indices, importances)
-
-
-# 分时间段建模疫情
-def covid_control_date_predict(df):
-    pass
-
-
-# 湖北外其他城市建模疫情
-def covid_predict_except_hubei(df):
-    pass
-
-
 
 def get_feature_final():
     # 1000 hPa relative humidity
@@ -233,56 +189,69 @@ def get_feature_final():
 
     df_all.to_csv("../output/COVID_final.csv", index=False)
 
+
 # main
 if __name__ == '__main__':
 
     #get_feature_final()
 
-    #df_all = pd.read_csv("../output/COVID.csv")
-    #df = shuffle(df_all)
-
-    df_all = pd.read_csv("../output/COVID_final.csv")
+    df_all = pd.read_csv("/Users/shaoqi/Desktop/COVID-19/output/COVID_final.csv")
+    df_all = df_all[~df_all['id'].isin(['371200', '710000', '810000'])]  # 去除台湾、香港和莱芜
     df_all = shuffle(df_all)
-    print(df_all.columns.values)
-    aaaaa
+    for i in df_all.columns.values:
+        print(i)
 
+    # 全时间段建模
+    df = df_all[['id', 'location',
+                 'rh_mean', 'rh_max', 'rh_min',
+                 't2m_mean', 't2m_max', 't2m_min',
+                 'confirmed', 'cured', 'dead',
+                 'moveIn_index_mean', 'moveIn_index_max', 'moveIn_index_min',
+                 'moveOut_index_mean', 'moveOut_index_max', 'moveOut_index_min',
+                 'travel_index_mean', 'travel_index_max', 'travel_index_min',
+                 '420100_moveIn_mean', '420100_moveIn_max', '420100_moveIn_min', 'npp']]
+
+    # label做log处理
+    confirmed = df['confirmed'].to_list()
+    confirmed = [np.log(i+1) for i in confirmed]
+    df.loc[:, 'confirmed_log'] = confirmed
+
+    # epidemic id 疫情灾区id，暂定武汉
     epidemicIds = [420100]
-
-    df = df_all[['id', 'location', 'rh_mean', 'rh_max', 'rh_min', 't2m_mean', 't2m_max', 't2m_min',
-         'confirmed', 'cured', 'dead',
-         'moveIn_index_mean', 'moveIn_index_max', 'moveIn_index_min',
-         'moveOut_index_mean', 'moveOut_index_max', 'moveOut_index_min',
-         'travel_index_mean', 'travel_index_max', 'travel_index_min',
-         '420100_moveIn_mean', '420100_moveIn_max', '420100_moveIn_min', 'npp']]
-
-    #confirmed = df['confirmed'].to_list()
-    #confirmed = [math.log(i+1) for i in confirmed]
-    #df.loc[:, 'confirmed'] = confirmed
-    #print(sorted(df['confirmed'].to_list()))
-
-    '''
-
-    df = df_all[['id', 'location', 'rh_mean_before', 'rh_max_before', 'rh_min_before', 't2m_mean_before',
-                 't2m_max_before', 't2m_min_before', 'confirmed_before', 'cured_before', 'dead_before',
-                 'moveIn_index_sum_before',
-                 'moveIn_index_max_before', 'moveIn_index_min_before', 'moveOut_index_sum_before',
-                 'moveOut_index_max_before',
-                 'moveOut_index_min_before', 'travel_index_sum_before', 'travel_index_max_before',
-                 'travel_index_min_before',
-                 '420100_moveIn_sum_before', '420100_moveOut_sum_before']]
-
-    df = df_all[['id', 'location', 'rh_mean_after', 'rh_max_after', 'rh_min_after', 't2m_mean_after',
-                 't2m_max_after', 't2m_min_after', 'confirmed_after', 'cured_after', 'dead_after',
-                 'moveIn_index_sum_after',
-                 'moveIn_index_max_after', 'moveIn_index_min_after', 'moveOut_index_sum_after',
-                 'moveOut_index_max_after',
-                 'moveOut_index_min_after', 'travel_index_sum_after', 'travel_index_max_after',
-                 'travel_index_min_after',
-                 '420100_moveIn_sum_after', '420100_moveOut_sum_after']]
-    
-    '''
-    #df = df[~df['id'].isin(epidemicIds)]
-
-    #feature_box(df, feature)
-
+    df = df[~df['id'].isin(epidemicIds)]
     covid_all_predict(df)
+
+    aaaaaa
+
+
+    # 管控前建模
+    df_before = df_all[['id', 'location',
+                        'rh_mean_before','rh_max_before','rh_min_before',
+                        't2m_mean_before','t2m_max_before','t2m_min_before',
+                        'confirmed_before','cured_before','dead_before',
+                        'moveIn_index_mean_before','moveIn_index_max_before','moveIn_index_min_before',
+                        'moveOut_index_mean_before','moveOut_index_max_before','moveOut_index_min_before',
+                        'travel_index_mean_before','travel_index_max_before','travel_index_min_before',
+                        '420100_moveIn_mean_before','420100_moveIn_max_before','420100_moveIn_min_before', 'npp']]
+
+    confirmed = df_before['confirmed_before'].to_list()
+    confirmed = [np.log(i + 1) for i in confirmed]
+    df_before.loc[:, 'confirmed_before_log'] = confirmed
+
+    covid_control_before_predict(df_before)
+
+    # 管控后建模
+    df_after = df_all[['id', 'location',
+                        'rh_mean_after', 'rh_max_after', 'rh_min_after',
+                        't2m_mean_after', 't2m_max_after', 't2m_min_after',
+                        'confirmed_after', 'cured_after', 'dead_after',
+                        'moveIn_index_mean_after', 'moveIn_index_max_after', 'moveIn_index_min_after',
+                        'moveOut_index_mean_after', 'moveOut_index_max_after', 'moveOut_index_min_after',
+                        'travel_index_mean_after', 'travel_index_max_after', 'travel_index_min_after',
+                        '420100_moveIn_mean_after', '420100_moveIn_max_after', '420100_moveIn_min_after',
+                        'npp']]
+
+    confirmed = df_after['confirmed_after'].to_list()
+    confirmed = [np.log(i + 1) for i in confirmed]
+    df_after.loc[:, 'confirmed_after_log'] = confirmed
+    covid_control_after_predict(df_after)

@@ -89,7 +89,7 @@ if __name__ == '__main__':
     city_distinct_id = china_city_distinct['id'].to_list()
     city_distinct_id = [str(i) for i in city_distinct_id]
 
-    #get_china_history_data(province_id, city_distinct_id)
+    get_china_history_data(province_id, city_distinct_id)
 
     covid_19_history_all = pd.read_csv("../output/COVID_history_city.csv")
 

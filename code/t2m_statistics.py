@@ -31,6 +31,7 @@ def distinct_statistics(years, months, days, times, t2m, pac_class_id, control_d
                 # 按行求和
                 pac_class_id[year + month + day] = t2m_temp.apply(lambda x: x.mean(), axis=1)
 
+    pac_class_id.to_csv("../data/ECMWF/zonal_statistics/city_t2m_day.csv", index=False)
 
     distinct_t2m = pac_class_id[['id']].copy()
 
