@@ -75,31 +75,95 @@ print(len(city_distinct))
 id2 = city_distinct['id'].to_list()
 
 print(set(id2).difference(set(id1)))
-
-
-aaaaaa
 '''
 
 
 df_all = pd.read_csv("./output/COVID_final.csv")
-for i in df_all.columns.values:
-    print(i)
 
-print(len(df_all))
+
+df = df_all[['id','npp','location',
+'rh_mean','rh_max','rh_min',
+'t2m_mean','t2m_max','t2m_min',
+'confirmed','cured','dead',
+'moveIn_index_mean','moveIn_index_max','moveIn_index_min',
+'moveOut_index_mean','moveOut_index_max','moveOut_index_min',
+'travel_index_mean','travel_index_max','travel_index_min',
+'420100_moveIn_mean','420100_moveIn_max','420100_moveIn_min',
+'confirmed_log','cured_log','dead_log']]
+
+df.columns = ['id','npp','location',
+'rhMean','rhMax','rhMin',
+'t2mMean','t2mMax','t2mMin',
+'confirmed','cured','dead',
+'moveInMean','moveInMax','moveInMin',
+'moveOutMean','moveOutMax','moveOutMin',
+'travelMean','travelMax','travelMin',
+'WuhanMean','WuhanMax','WuhanMin',
+'confirmLog','curedLog','deadLog']
+
+
+df_before = df_all[['id','npp','location',
+'rh_mean_before','rh_max_before','rh_min_before',
+'t2m_mean_before','t2m_max_before','t2m_min_before',
+'confirmed_before','cured_before','dead_before',
+'moveIn_index_mean_before','moveIn_index_max_before','moveIn_index_min_before',
+'moveOut_index_mean_before','moveOut_index_max_before','moveOut_index_min_before',
+'travel_index_mean_before','travel_index_max_before','travel_index_min_before',
+'420100_moveIn_mean_before','420100_moveIn_max_before','420100_moveIn_min_before',
+'confirmed_before_log','cured_before_log','dead_before_log']]
+
+
+df_before.columns = ['id','npp','location',
+'rhMean','rhMax','rhMin',
+'t2mMean','t2mMax','t2mMin',
+'confirmed','cured','dead',
+'moveInMean','moveInMax','moveInMin',
+'moveOutMean','moveOutMax','moveOutMin',
+'travelMean','travelMax','travelMin',
+'WuhanMean','WuhanMax','WuhanMin',
+'confirmLog','curedLog','deadLog']
+
+
+df_after = df_all[['id','npp','location',
+'rh_mean_after','rh_max_after','rh_min_after',
+'t2m_mean_after','t2m_max_after','t2m_min_after',
+'confirmed_after','cured_after','dead_after',
+'moveIn_index_mean_after','moveIn_index_max_after','moveIn_index_min_after',
+'moveOut_index_mean_after','moveOut_index_max_after','moveOut_index_min_after',
+'travel_index_mean_after','travel_index_max_after','travel_index_min_after',
+'420100_moveIn_mean_after','420100_moveIn_max_after','420100_moveIn_min_after',
+'confirmed_after_log','cured_after_log','dead_after_log']]
+
+df_after.columns = ['id','npp','location',
+'rhMean','rhMax','rhMin',
+'t2mMean','t2mMax','t2mMin',
+'confirmed','cured','dead',
+'moveInMean','moveInMax','moveInMin',
+'moveOutMean','moveOutMax','moveOutMin',
+'travelMean','travelMax','travelMin',
+'WuhanMean','WuhanMax','WuhanMin',
+'confirmLog','curedLog','deadLog']
 
 
 # 2015 China city shp
 path = './shp/china_city_UTM.shp'
 shp_city = geopandas.GeoDataFrame.from_file(path)
 shp_city.rename(columns={'city_id': 'id'}, inplace=True)
-print(len(shp_city))
-print(shp_city)
-aaaaaa
 
-shp_city = pd.merge(shp_city, df_all, how='inner', on='id')
-shp_city = shp_city.fillna(value=0)
-shp_city.to_file("./shp/china_city_distinct_COVID19_after.shp", encoding='utf-8')
-print(len(shp_city))
+
+shp_city_all = pd.merge(shp_city, df, how='inner', on='id')
+shp_city_all.to_file("./shp/china_city_distinct_COVID19.shp", encoding='utf-8')
+print(len(shp_city_all))
+
+
+shp_city_before = pd.merge(shp_city, df_before, how='inner', on='id')
+shp_city_before.to_file("./shp/china_city_distinct_COVID19_before.shp", encoding='utf-8')
+print(len(shp_city_before))
+
+
+shp_city_after = pd.merge(shp_city, df_after, how='inner', on='id')
+shp_city_after.to_file("./shp/china_city_distinct_COVID19_after.shp", encoding='utf-8')
+print(len(shp_city_after))
 
 aaaaa
 

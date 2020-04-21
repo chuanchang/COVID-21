@@ -16,7 +16,10 @@ import numpy as np
 from sklearn.model_selection import KFold
 import scipy
 import math
+import geopandas as gp
 
+
+threshold = 50
 
 # feature importance 特征重要性
 def feture_importance(features, indices, importances):
@@ -37,7 +40,7 @@ def feture_importance(features, indices, importances):
 # 评价指标
 def evaluation(real_y, prediction_y):
 
-    # rmse  mae r2
+    # rmse  mae  r2  r
     slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(real_y, prediction_y)
     print("R-squared", r_value**2)
     print("R", r_value)
@@ -48,64 +51,73 @@ def evaluation(real_y, prediction_y):
     rmse = mean_squared_error(real_y, prediction_y) ** 0.5
     print("rmse", rmse)
 
-
-    figsize = 12, 8
-    figure, ax = plt.subplots(figsize=figsize)
-
-    plt.scatter(real_y, prediction_y, c='g', marker='o', label='', s=20, alpha=0.7, zorder=20)
-    plt.plot([0, 50000], [0, 50000], '--', color='black', label='', linewidth=1.0)
-
-    ############# 设置坐标刻度值的大小以及刻度值的字体 #############
-    plt.xlim(0, 4000)
-    plt.ylim(0, 4000)
-    plt.tick_params(labelsize=25)
-
-    labels = ax.get_yticklabels()
-    [label.set_fontname('Times New Roman') for label in labels]
-
-    labels = ax.get_xticklabels()
-    [label.set_fontname('Times New Roman') for label in labels]
-
     ############# 设置图例并且设置图例的字体及大小 #############
     font1 = {'family': 'Times New Roman',
-             'weight': 'normal',
-             'size': 25,
-             }
+            'weight': 'normal',
+            'size': 15,
+            }
+    
+    figsize = 20,16
+    figure, ax = plt.subplots(figsize=figsize)
+    level = [50000, 5500, 1000, 200, 100, 80, 60, 40,20]
+    for i in range(len(level)):
 
-    plt.ylabel('prediction', font1)
-    plt.xlabel('real', font1)
-    ax = plt.gca()
-    ax.set_aspect(1)
+        plt.subplot(3,3,i+1)
+        plt.scatter(real_y, prediction_y, c='b', marker='o', label='', s=10, alpha=0.7, zorder=20)
+        plt.plot([0, 50000], [0, 50000], '--', color='black', label='', linewidth=1.0)
+        
+        ############# 设置坐标刻度值的大小以及刻度值的字体 #############
+        plt.xlim(0, level[i])
+        plt.ylim(0, level[i])
+        plt.tick_params(labelsize=15)
+        
+        plt.ylabel('prediction', font1)
+        plt.xlabel('real', font1)
+
+        # x，y轴设置显示刻度一致
+        ax = plt.gca()
+        ax.set_aspect(1)
+    
     plt.show()
 
 
 # 全时间段疫情建模
-def covid_all_predict(df):
+def covid_all_predict(df, index):
+
+    df = df[['id','location',
+    'rhMean','rhMax','rhMin',
+    't2mMean','t2mMax','t2mMin',
+    'moveInMean','moveInMax','moveInMin',
+    'moveOutMea','moveOutMax','moveOutMin',
+    'travelMean','travelMax','travelMin',
+    'WuhanMean','WuhanMax','WuhanMin',
+    'confirmed','confirmLog','npp']]
 
     real_y = []
     prediction_y = []
 
-    kf = KFold(3, True)
-    index = []
-    for train_index, test_index in kf.split(df):
-        index.append((train_index, test_index))
+    df_predict = []
 
-    clf = [RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5),
-           RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5),
-           RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5)]
+    case = []
+
+    clf = []
+    for i in range(len(index)):
+        clf.append(RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5))
+    
 
     for i in range(len(index)):
 
         train_df = df.iloc[index[i][0], :]
         test_df = df.iloc[index[i][1], :]
 
-        train_y_log = train_df['confirmed_log']
-        train_y = train_df['confirmed']
+        df_predict.extend(test_df['id'].to_list())
 
-        train_x = train_df.drop(['id', 'location', 'confirmed_log', 'confirmed', 'cured', 'dead'], axis=1)
+        train_y_log = train_df['confirmLog']
+        train_y = train_df['confirmed']
+        train_x = train_df.drop(['id', 'location', 'confirmLog', 'confirmed'], axis=1)
 
         test_y = test_df['confirmed']
-        test_x = test_df.drop(['id', 'location', 'confirmed_log', 'confirmed', 'cured', 'dead'], axis=1)
+        test_x = test_df.drop(['id', 'location', 'confirmLog', 'confirmed'], axis=1)
 
         clf[i].fit(train_x, train_y_log)
 
@@ -119,22 +131,42 @@ def covid_all_predict(df):
         prediction_y.extend(predict_ytest)
 
         print("train fold " + str(i+1))
+        print("预测误差较大城市，绝对值误差阈值设置为" + str(threshold))
+        predict_train_y = list(predict_ytrain)
+        train_yy = train_y.to_list()
+        for j in range(len(train_df)):
+            if abs(train_yy[j]-predict_train_y[j])>threshold:
+                print(train_df.iloc[j, 1] + "   real: " + str(train_yy[j]) + "   pre:" + str(predict_train_y[j]))
+                case.append(train_df.iloc[j, 0])
+        
         evaluation(train_y, predict_ytrain)
 
-        print("test fold " + str(i+1))
-        evaluation(test_y, predict_ytest)
 
+        print("#########################################")
+
+
+        print("test fold " + str(i+1))
+        print("预测误差较大城市，绝对值误差阈值设置为" + str(threshold))
+        predict_test_y = list(predict_ytest)
+        test_yy = test_y.to_list()
+        for j in range(len(test_df)):
+            if abs(test_yy[j]-predict_test_y[j])>threshold:
+                print(test_df.iloc[j, 1] + "   real: " + str(test_yy[j]) + "   pre:" + str(predict_test_y[j]))
+                case.append(test_df.iloc[j, 0])
+
+        evaluation(test_y, predict_ytest)
+    
+
+    df_predict = pd.DataFrame(df_predict)
+    df_predict.columns = ['id']
+    df_predict['predict'] = prediction_y
 
     print("************* cv evaluation ***************")
     evaluation(real_y, prediction_y)
 
-    for i, j in zip(real_y, prediction_y):
-        if abs(i-j)>100:
-            print(i, j)
-
     # feature importance
-    train_y = df['confirmed_log']
-    train_x = df.drop(['id', 'location', 'confirmed_log', 'confirmed', 'cured', 'dead'], axis=1)
+    train_y = df['confirmLog']
+    train_x = df.drop(['id', 'location', 'confirmLog', 'confirmed'], axis=1)
 
     clf = RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5)
     clf.fit(train_x, train_y)
@@ -143,6 +175,8 @@ def covid_all_predict(df):
     importances = clf.feature_importances_
     indices = np.argsort(importances)
     feture_importance(features, indices, importances)
+
+    return case, df_predict
 
 def get_feature_final():
     # 1000 hPa relative humidity
@@ -227,66 +261,30 @@ def get_feature_final():
 if __name__ == '__main__':
 
     # 整合特征
-    get_feature_final()
-    aaaaa
+    #get_feature_final()
 
-    df_all = pd.read_csv("./output/COVID_final.csv")
-    df_all = shuffle(df_all)
-
-    for i in df_all.columns.values:
-        print(i)
-
-    # 全时间段建模
-    df = df_all[['id', 'location',
-                 'rh_mean', 'rh_max', 'rh_min',
-                 't2m_mean', 't2m_max', 't2m_min',
-                 'confirmed', 'cured', 'dead',
-                 'moveIn_index_mean', 'moveIn_index_max', 'moveIn_index_min',
-                 'moveOut_index_mean', 'moveOut_index_max', 'moveOut_index_min',
-                 'travel_index_mean', 'travel_index_max', 'travel_index_min',
-                 '420100_moveIn_mean', '420100_moveIn_max', '420100_moveIn_min', 'npp']]
-
-    # label做log处理
-    confirmed = df['confirmed'].to_list()
-    confirmed = [np.log(i+1) for i in confirmed]
-    df.loc[:, 'confirmed_log'] = confirmed
-
+    df = gp.GeoDataFrame.from_file("./shp/china_city_distinct_COVID19.shp")
+    
+    kf = KFold(3, True)
+    index = []
+    for train_index, test_index in kf.split(df):
+        index.append((train_index, test_index))
+    
     # epidemic id 疫情灾区id，暂定武汉
     epidemicIds = [420100]
+
+    # 全时间段建模
     #df = df[~df['id'].isin(epidemicIds)]
-    covid_all_predict(df)
-
-    aaaaaa
-
+    #case, df_predict = covid_all_predict(df, index)
+    #df = pd.merge(df, df_predict, how='inner', on='id')
+    #df = df[df['id'].isin(case)].sort_values(by='confirmed', ascending=False)
 
     # 管控前建模
-    df_before = df_all[['id', 'location',
-                        'rh_mean_before','rh_max_before','rh_min_before',
-                        't2m_mean_before','t2m_max_before','t2m_min_before',
-                        'confirmed_before','cured_before','dead_before',
-                        'moveIn_index_mean_before','moveIn_index_max_before','moveIn_index_min_before',
-                        'moveOut_index_mean_before','moveOut_index_max_before','moveOut_index_min_before',
-                        'travel_index_mean_before','travel_index_max_before','travel_index_min_before',
-                        '420100_moveIn_mean_before','420100_moveIn_max_before','420100_moveIn_min_before', 'npp']]
+    df_before = gp.GeoDataFrame.from_file("./shp/china_city_distinct_COVID19_before.shp")
 
-    confirmed = df_before['confirmed_before'].to_list()
-    confirmed = [np.log(i + 1) for i in confirmed]
-    df_before.loc[:, 'confirmed_before_log'] = confirmed
-
-    covid_control_before_predict(df_before)
+    #covid_all_predict(df_before, index)
 
     # 管控后建模
-    df_after = df_all[['id', 'location',
-                        'rh_mean_after', 'rh_max_after', 'rh_min_after',
-                        't2m_mean_after', 't2m_max_after', 't2m_min_after',
-                        'confirmed_after', 'cured_after', 'dead_after',
-                        'moveIn_index_mean_after', 'moveIn_index_max_after', 'moveIn_index_min_after',
-                        'moveOut_index_mean_after', 'moveOut_index_max_after', 'moveOut_index_min_after',
-                        'travel_index_mean_after', 'travel_index_max_after', 'travel_index_min_after',
-                        '420100_moveIn_mean_after', '420100_moveIn_max_after', '420100_moveIn_min_after',
-                        'npp']]
+    df_after = gp.GeoDataFrame.from_file("./shp/china_city_distinct_COVID19_after.shp")
+    covid_all_predict(df_after, index)
 
-    confirmed = df_after['confirmed_after'].to_list()
-    confirmed = [np.log(i + 1) for i in confirmed]
-    df_after.loc[:, 'confirmed_after_log'] = confirmed
-    covid_control_after_predict(df_after)
