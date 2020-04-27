@@ -21,7 +21,7 @@ def distinct_statistics(years, months, days, times, rh, pac_class_id, control_da
     cols = list(rh)
     for year in years:
         for month in months[year]:
-            for day in days:
+            for day in days[month]:
                 col = []
                 for time in times:
                     if 'rh' + '_' + year + month + day + '_' + time in cols:
@@ -73,7 +73,13 @@ if __name__ == '__main__':
     # year month day times
     years = ['2020']
     months = {'2020': ['01', '02', '03']}
-    days = ['01', '02', '03',
+    days = {'01': ['17', '18',
+            '19', '20', '21',
+            '22', '23', '24',
+            '25', '26', '27',
+            '28', '29', '30',
+            '31'],
+            '02': ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',
             '10', '11', '12',
@@ -82,8 +88,8 @@ if __name__ == '__main__':
             '19', '20', '21',
             '22', '23', '24',
             '25', '26', '27',
-            '28', '29', '30',
-            '31']
+            '28', '29'],
+            '03': ['01']}
     times = [
         '0000', '0100', '0200',
         '0300', '0400', '0500',
@@ -95,6 +101,6 @@ if __name__ == '__main__':
         '2100', '2200', '2300',
     ]
 
-    control_date = '20200126'
+    control_date = '20200125'
 
     distinct_statistics(years, months, days, times, rh, pac_class_id, control_date)

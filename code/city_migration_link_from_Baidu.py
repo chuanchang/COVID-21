@@ -48,13 +48,13 @@ def city_migration_link(china_city_distinct, years, months, days):
                         print(url)
 
                 city_link = pd.DataFrame(city_link)
-                city_link.to_csv("../output/city_migration_link_" + date + ".csv", index=False, sep=' ', header=None)
-
+                city_link.to_csv("./code/pygcn-master/data/covid/covid.cites", index=False, header=None, sep='\t')
+                print("end")
 # main
 if __name__ == '__main__':
 
     # China location id
-    china_location = pd.read_csv("../data/china_location_id_2015.csv", sep=',')
+    china_location = pd.read_csv("./data/china_location_id_2015.csv", sep=',')
 
     # china city
     china_city = china_location.loc[china_location['city'] == 1, ['id', 'city_baidu_id', 'location']]
@@ -69,9 +69,10 @@ if __name__ == '__main__':
     china_city_distinct = pd.concat([china_city, china_distinct])
     china_city_distinct = china_city_distinct[china_city_distinct['city_baidu_id']!=-999]
 
+    china_city_distinct = china_city_distinct[~china_city_distinct['id'].isin(['710000', '810000', '820000', '659006', '659007', '659008', '460300'])]
     # year month day
     years = ['2020']
-    months = {'2020': ['01']}
+    months = {'2020': ['02']}
     days = ['01', '02', '03',
             '04', '05', '06',
             '07', '08', '09',
@@ -83,7 +84,7 @@ if __name__ == '__main__':
             '25', '26', '27',
             '28', '29', '30',
             '31']
-    days = ['22']
+    days = ['02']
 
     # migration link
     city_migration_link(china_city_distinct, years, months, days)

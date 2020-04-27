@@ -99,7 +99,7 @@ def epidemic_migration_proportion(china_city_distinct, epidemicIds, years, month
 
         for year in years:
             for month in months[year]:
-                for day in days:
+                for day in days[month]:
 
                     date = year + month + day
                     url = 'http://huiyan.baidu.com/migration/cityrank.jsonp?dt=city&id=' + str(id) + '&type=move_out' + '&date=' + date
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     path = os.path.realpath(os.curdir)
 
     # China location id
-    china_location = pd.read_csv("../data/china_location_id_2015.csv")
+    china_location = pd.read_csv("./data/china_location_id_2015.csv")
 
     # china city
     china_city = china_location.loc[china_location['city'] == 1, ['city_baidu_id', 'location', 'id']]
@@ -157,23 +157,29 @@ if __name__ == '__main__':
     # year month day
     years = ['2020']
     months = {'2020': ['01', '02', '03']}
-    days = ['01', '02', '03',
-            '04', '05', '06',
-            '07', '08', '09',
-            '10', '11', '12',
-            '13', '14', '15',
-            '16', '17', '18',
-            '19', '20', '21',
-            '22', '23', '24',
-            '25', '26', '27',
-            '28', '29', '30',
-            '31']
+    days = {'01': ['17', '18',
+                   '19', '20', '21',
+                   '22', '23', '24',
+                   '25', '26', '27',
+                   '28', '29', '30',
+                   '31'],
+            '02': ['01', '02', '03',
+                   '04', '05', '06',
+                   '07', '08', '09',
+                   '10', '11', '12',
+                   '13', '14', '15',
+                   '16', '17', '18',
+                   '19', '20', '21',
+                   '22', '23', '24',
+                   '25', '26', '27',
+                   '28', '29'],
+            '03': ['01']}
 
-    control_date = '20200126'
+    control_date = '20200125'
 
     # migration
     china_city_distinct_moveIn_from_Wuhan = epidemic_migration_proportion(china_city_distinct, epidemicIds, years, months, days)
-    china_city_distinct_moveIn_from_Wuhan.to_csv("../data/baidu_migration/city_move_in_from_WuHan.csv", index=False)
+    china_city_distinct_moveIn_from_Wuhan.to_csv("./data/baidu_migration/city_move_in_from_WuHan.csv", index=False)
 
     # city migration In sum
     epidemic_moveIn_sum = china_city_distinct_moveIn_from_Wuhan[['id', 'name', 'city_baidu_id']].copy()
@@ -201,7 +207,7 @@ if __name__ == '__main__':
         epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_min_before'] = epidemic_moveIn_before.apply(lambda x: x.min(), axis=1)
         epidemic_moveIn_sum.loc[:, str(id) + '_moveIn_min_after'] = epidemic_moveIn_after.apply(lambda x: x.min(), axis=1)
 
-    epidemic_moveIn_sum.to_csv("../data/baidu_migration/city_move_in_from_WuHan_sum.csv", index=False)
+    epidemic_moveIn_sum.to_csv("./data/baidu_migration/city_move_in_from_WuHan_sum.csv", index=False)
 
     '''
     # migration

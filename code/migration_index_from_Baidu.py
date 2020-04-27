@@ -31,7 +31,7 @@ def moveIn_migration_index(china_city_distinct, years, months, days, control_dat
 
             for year in years:
                 for month in months[year]:
-                    for day in days:
+                    for day in days[month]:
                         if year + month + day in city_data.keys():
                             china_city_moveIn.loc[china_city_moveIn['city_baidu_id'] == id, year + month + day + '_moveIn'] = city_data[year + month + day]
                         else:
@@ -59,7 +59,7 @@ def moveOut_migration_index(china_city_distinct, years, months, days, control_da
 
             for year in years:
                 for month in months[year]:
-                    for day in days:
+                    for day in days[month]:
                         if year + month + day in city_data.keys():
                             china_city_moveOut.loc[china_city_moveOut['city_baidu_id'] == id, year + month + day + '_moveOut'] = city_data[year + month + day]
                         else:
@@ -87,7 +87,7 @@ def travel_intensity(china_city_distinct, years, months, days, control_date):
 
             for year in years:
                 for month in months[year]:
-                    for day in days:
+                    for day in days[month]:
                         if year + month + day in city_data.keys():
                             china_city_travel.loc[china_city_travel['city_baidu_id'] == id, year + month + day + '_travel'] = city_data[year + month + day]
                         else:
@@ -126,19 +126,25 @@ if __name__ == '__main__':
     # year month day
     years = ['2020']
     months = {'2020': ['01', '02', '03']}
-    days = ['01', '02', '03',
-            '04', '05', '06',
-            '07', '08', '09',
-            '10', '11', '12',
-            '13', '14', '15',
-            '16', '17', '18',
-            '19', '20', '21',
-            '22', '23', '24',
-            '25', '26', '27',
-            '28', '29', '30',
-            '31']
+    days = {'01': ['17', '18',
+                   '19', '20', '21',
+                   '22', '23', '24',
+                   '25', '26', '27',
+                   '28', '29', '30',
+                   '31'],
+            '02': ['01', '02', '03',
+                   '04', '05', '06',
+                   '07', '08', '09',
+                   '10', '11', '12',
+                   '13', '14', '15',
+                   '16', '17', '18',
+                   '19', '20', '21',
+                   '22', '23', '24',
+                   '25', '26', '27',
+                   '28', '29'],
+            '03': ['01']}
 
-    control_date = '20200126'
+    control_date = '20200125'
 
     # city moveIn moveOut travel
     moveIn = moveIn_migration_index(china_city_distinct, years, months, days, control_date)

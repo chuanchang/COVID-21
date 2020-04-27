@@ -4,22 +4,26 @@
 """
 AkShare平台 https://akshare.readthedocs.io/zh_CN/latest/data/event/event.html
 
-世界历史疫情数据，提取中国地级市的历史疫情数据，2020-1-1~2020-3-31
+世界历史疫情数据，提取中国地级市的历史疫情数据
 """
 
 # load package
 import akshare as ak
 import time
 import pandas as pd
+import geopandas as gp
 
 
 def get_china_history_data(province_id, city_distinct_id):
     # get data
     covid_19_history_df = ak.covid_19_history()
     covid_19_history_df = covid_19_history_df[covid_19_history_df['country'] == '中国']
+    covid_19_history_china = covid_19_history_df[(covid_19_history_df['province'] == '') & (covid_19_history_df['city'] == '')]
+    covid_19_history_china = covid_19_history_china[['date', 'confirmed', 'cured', 'dead']]
+    covid_19_history_china.to_csv("./output/COVID_china.csv", index=False)
+
     covid_19_history_df = covid_19_history_df[['date', 'province', 'provinceCode', 'city', 'cityCode',
                                                'confirmed', 'cured', 'dead']]
-
     # 去除nan
     covid_19_history_df = covid_19_history_df.drop(covid_19_history_df[covid_19_history_df['province'] == ''].index)
 
@@ -30,7 +34,7 @@ def get_china_history_data(province_id, city_distinct_id):
     covid_19_history_province[['provinceCode', 'confirmed', 'cured', 'dead']] = \
         covid_19_history_province[['provinceCode', 'confirmed', 'cured', 'dead']].astype(int)
 
-    covid_19_history_province.to_csv("../output/COVID_history_province.csv", index=False)
+    covid_19_history_province.to_csv("./output/COVID_history_province.csv", index=False)
 
     # 直辖市
     covid_19_history_province.columns = ['date', 'city', 'cityCode', 'confirmed', 'cured', 'dead']
@@ -61,14 +65,14 @@ def get_china_history_data(province_id, city_distinct_id):
     #city_distinct_id = [int(i) for i in city_distinct_id]
     #print(set(city_distinct_id).difference(set(covid_19_history_all['cityCode'].to_list())))
 
-    covid_19_history_all.to_csv("../output/COVID_history_city.csv", index=False)
+    covid_19_history_all.to_csv("./output/COVID_history_city.csv", index=False)
 
 
 # main
 if __name__ == '__main__':
 
     # China location id
-    china_location = pd.read_csv("../data/china_location_id_2015.csv", sep=',')
+    china_location = pd.read_csv("./data/china_location_id_2015.csv", sep=',')
     china_location = china_location[['id', 'location', 'province', 'city', 'distinct',
                                      'province_id', 'city_id']]
 
@@ -91,12 +95,12 @@ if __name__ == '__main__':
 
     get_china_history_data(province_id, city_distinct_id)
 
-    covid_19_history_all = pd.read_csv("../output/COVID_history_city.csv")
+    covid_19_history_all = pd.read_csv("./output/COVID_history_city.csv")
 
 
 
     # 获取累计到2020-1-26的疫情数据
-    control_date = '2020-01-26'
+    control_date = '2020-01-25'
     covid_19_history_before = covid_19_history_all[covid_19_history_all['date'] == control_date]
     covid_19_history_before = covid_19_history_before[['cityCode', 'confirmed', 'cured', 'dead']]
     covid_19_history_before.columns = ['id', 'confirmed_before', 'cured_before', 'dead_before']
@@ -104,10 +108,10 @@ if __name__ == '__main__':
 
 
     # 获取累计到今天的疫情数据
-    covid_19_history_after = covid_19_history_all[covid_19_history_all['date'] == "2020-03-31"]
+    covid_19_history_after = covid_19_history_all[covid_19_history_all['date'] == "2020-03-01"]
     covid_19_history_after = covid_19_history_after[['cityCode', 'confirmed', 'cured', 'dead']]
     covid_19_history_after.columns = ['id', 'confirmed', 'cured', 'dead']
-    print("2020-03-31: " + str(len(covid_19_history_after)))
+    print("2020-03-01: " + str(len(covid_19_history_after)))
 
     china_city_distinct = pd.merge(china_city_distinct, covid_19_history_before, how='left', on='id')
     china_city_distinct = pd.merge(china_city_distinct, covid_19_history_after, how='left', on='id')
@@ -119,5 +123,18 @@ if __name__ == '__main__':
     china_city_distinct[['confirmed_before', 'cured_before', 'dead_before', 'confirmed', 'cured', 'dead', 'confirmed_after', 'cured_after', 'dead_after']] \
         = china_city_distinct[['confirmed_before', 'cured_before', 'dead_before', 'confirmed', 'cured', 'dead', 'confirmed_after', 'cured_after', 'dead_after']].astype(int)
 
-    china_city_distinct.to_csv("../output/COVID_city_distinct.csv", index=False)
+    china_city_distinct.to_csv("./output/COVID_city_distinct.csv", index=False)
+
+
+    # 2015 China city shp
+    path = './shp/china_city_UTM.shp'
+    shp_city = gp.GeoDataFrame.from_file(path)
+    shp_city.rename(columns={'city_id': 'id'}, inplace=True)
+    print(len(shp_city))
+
+    covid = china_city_distinct[['id', 'confirmed']]
+    shp_city_all = pd.merge(shp_city, covid, how='left', on='id')
+    shp_city_all = shp_city_all.fillna(0)
+    shp_city_all.to_file("./shp/china_COVID19.shp", encoding='utf-8')
+    print(len(shp_city_all))
 
