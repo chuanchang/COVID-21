@@ -109,7 +109,7 @@ def covid_all_predict(df, index, clf, threshold):
     'moveOutMea',
     'travelMean',
     'WuhanMean',
-    'people', 'GDPTotal', 'GDPPerson',
+    'people', 'GDPTotal', 
     'confirmed','confirmLog']]
 
     real_y = []

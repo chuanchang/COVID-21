@@ -190,6 +190,8 @@ if __name__ == '__main__':
 
 
     df = gp.GeoDataFrame.from_file("../shp/china_city_distinct_COVID19.shp")
+    #df = gp.GeoDataFrame.from_file("../shp/china_city_distinct_COVID19_before.shp")
+    #df = gp.GeoDataFrame.from_file("../shp/china_city_distinct_COVID19_after.shp")
     
     kf = KFold(10, True)
     index = []
@@ -203,6 +205,8 @@ if __name__ == '__main__':
     df['diff'] = df['confirmed'] - df['predict']
 
     df.to_file("../result/COVID_gwr.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_gwr_before.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_gwr_after.shp", encoding='utf-8')
     
     # 不含武汉
     epidemicIds = [420100]

@@ -33,11 +33,26 @@ def feture_importance(features, indices, importances):
     for i in indices:
         print(features[i], importances[i])
     '''
+    plt.rcParams['font.sans-serif']=['Times New Roman']#用来正常显示中文标签
+    plt.rcParams['axes.unicode_minus']=False#用来正常显示负号
+    
+    fig = plt.figure(figsize=(10, 8))
+    plt.barh(range(len(indices)), importances[indices], color='dodgerblue', align='center')
+    
+    #设置横纵坐标的名称以及对应字体格式  
+    font = {'family' : 'Times New Roman',  
+    'weight' : 'normal',  
+    'size'   : 25,  
+    }
 
-    plt.barh(range(len(indices)), importances[indices], color='b', align='center', alpha=0.5)
     plt.yticks(range(len(indices)), [features[i] for i in indices])
-    plt.xlabel('feature Importance')
+    plt.xlabel('feature Importance',font)
+    plt.tick_params(labelsize=20)
+
+    plt.savefig('./picture/feature_importance.eps', dpi=400)
     plt.show()
+
+    aaaaa
 
 
 # 评价指标
@@ -64,7 +79,7 @@ def predict_plot(real_y, prediction_y):
     
     figsize = 20,16
     figure, ax = plt.subplots(figsize=figsize)
-    level = [50000, 5500, 1000, 200, 100, 80, 60, 40,20]
+    level = [50000, 5500, 1000, 500, 200, 100, 80, 60, 40]
     for i in range(len(level)):
 
         plt.subplot(3,3,i+1)
@@ -98,6 +113,7 @@ def covid_all_predict(df, index, clf, threshold):
     'travelMean','travelMax','travelMin',
     'WuhanMean','WuhanMax','WuhanMin',
     'confirmed','confirmLog','npp']]
+    'people', 'GDPTotal', 'GDPPerson',
     '''
     scale = preprocessing.StandardScaler()
 
@@ -108,7 +124,7 @@ def covid_all_predict(df, index, clf, threshold):
     'moveOutMea',
     'travelMean',
     'WuhanMean',
-    'people', 'GDPTotal', 'GDPPerson',
+    'people', 'GDPTotal',
     'confirmed','confirmLog']]
 
     real_y = []
@@ -171,6 +187,7 @@ def covid_all_predict(df, index, clf, threshold):
 
         evaluation(test_y, predict_ytest)
         #predict_plot(test_y, predict_ytest)
+        print("                            ")
     
 
     df_predict = pd.DataFrame(df_predict)
@@ -181,18 +198,19 @@ def covid_all_predict(df, index, clf, threshold):
     evaluation(real_y, prediction_y)
     predict_plot(real_y, prediction_y)
 
-    '''
+ 
     # feature importance
     train_y = df['confirmLog']
     train_x = df.drop(['id', 'location', 'confirmLog', 'confirmed'], axis=1)
 
     clf[0].fit(train_x, train_y)
 
-    features = list(train_x)
-    importances = clf.feature_importances_
+    features = ['Rh', 'T2m', 'MoveIn', 'MoveOut', 'Travel', 'WuhanProportion', 'People', 'GDP']
+    print(features)
+    importances = clf[0].feature_importances_
     indices = np.argsort(importances)
     feture_importance(features, indices, importances)
-    '''
+
 
     return case, df_predict
 
@@ -201,7 +219,7 @@ def covid_all_predict(df, index, clf, threshold):
 if __name__ == '__main__':
 
 
-    df = gp.GeoDataFrame.from_file("../shp/china_city_distinct_COVID19.shp")
+    df = gp.GeoDataFrame.from_file("./shp/china_city_distinct_COVID19.shp")
     
     kf = KFold(10, True)
     index = []
@@ -210,25 +228,25 @@ if __name__ == '__main__':
 
     clf = []
     for i in range(len(index)):
-        #clf.append(RandomForestRegressor(n_estimators=10, min_samples_split=5, max_depth=5))
-        #clf.append(GradientBoostingRegressor(n_estimators=20, min_samples_split=2, min_samples_leaf=1, max_depth=3))
+        clf.append(RandomForestRegressor(n_estimators=15, min_samples_split=5, max_depth=5))
+        #clf.append(GradientBoostingRegressor(n_estimators=18, min_samples_split=5, min_samples_leaf=4, max_depth=4))
         #clf.append(svm.SVR(kernel='rbf', C=1.5, gamma=0.1))
-        clf.append(linear_model.Lasso(alpha=0.01))
-        #clf.append(MLPRegressor(hidden_layer_sizes=(8, 6), alpha=1, solver='adam', max_iter=3000))
-        #clf.append(linear_model.Lars(n_nonzero_coefs=5))
+        #clf.append(linear_model.Lasso(alpha=0.02))
+        #clf.append(MLPRegressor(hidden_layer_sizes=(8, 6), alpha=0.1, solver='adam', max_iter=5000))
+        #clf.append(linear_model.Lars(n_nonzero_coefs=10))
 
     
     # 全时间段建模
     case, df_predict = covid_all_predict(df, index, clf, threshold = 50)
     df = pd.merge(df, df_predict, how='inner', on='id')
     df['diff'] = df['confirmed'] - df['predict']
-
-    #df.to_file("../result/COVID_rf.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_gbdt.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_svm.shp", encoding='utf-8')
-    df.to_file("../result/COVID_lasso.shp", encoding='utf-8')
-    #df.to_file("./result/COVID_bp.shp", encoding='utf-8')
-    #df.to_file("./result/COVID_lars.shp", encoding='utf-8')
+    
+    #df.to_file("../result/COVID_rf_after.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_gbdt_after.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_svm_after.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_lasso_after.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_bp_after.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_lars_after.shp", encoding='utf-8')
 
     epidemicIds = [420100]
     df = df[~df['id'].isin(epidemicIds)]
