@@ -78,7 +78,7 @@ if __name__ == '__main__':
     }
 
     plt.xlabel('Date',font)
-    plt.ylabel('cumulative confirmed cases',font)
+    plt.ylabel('CCCs',font)
 
     plt.savefig('./picture/china_COVID.eps', dpi=400)
 

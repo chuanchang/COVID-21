@@ -97,6 +97,8 @@ def epidemic_migration_proportion(china_city_distinct, epidemicIds, years, month
 
     for id in epidemicIds:
 
+        moveOut, moveIn = move_migration_index(id)
+
         for year in years:
             for month in months[year]:
                 for day in days[month]:
@@ -114,12 +116,12 @@ def epidemic_migration_proportion(china_city_distinct, epidemicIds, years, month
                             value = city_data[i]['value'] 
 
                             if name in china_city_distinct_name:
-                                china_city_distinct_moveIn_from_Wuhan.loc[china_city_distinct_moveIn_from_Wuhan['name'] == name, str(id) + '_' + date + '_moveIn'] = value
+                                china_city_distinct_moveIn_from_Wuhan.loc[china_city_distinct_moveIn_from_Wuhan['name'] == name, str(id) + '_' + date + '_moveIn'] = moveOut[date] * value
 
                             else:
                                 print(name)
 
-                        china_city_distinct_moveIn_from_Wuhan.loc[china_city_distinct_moveIn_from_Wuhan['city_baidu_id'] == id, str(id) + '_' + date + '_moveIn'] = 100
+                        china_city_distinct_moveIn_from_Wuhan.loc[china_city_distinct_moveIn_from_Wuhan['city_baidu_id'] == id, str(id) + '_' + date + '_moveIn'] = moveOut[date] * 100
 
                     else:
                         print(url)
