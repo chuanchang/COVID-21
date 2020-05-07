@@ -123,7 +123,7 @@ def covid_all_predict(df, index, clf, threshold):
     'moveInMean',
     'moveOutMea',
     'travelMean',
-    'WuhanMean',
+    'WuhanMean', 
     'people', 'GDPTotal',
     'confirmed','confirmLog']]
 
@@ -196,21 +196,7 @@ def covid_all_predict(df, index, clf, threshold):
 
     print("************* cv evaluation ***************")
     evaluation(real_y, prediction_y)
-    predict_plot(real_y, prediction_y)
-
- 
-    # feature importance
-    train_y = df['confirmLog']
-    train_x = df.drop(['id', 'location', 'confirmLog', 'confirmed'], axis=1)
-
-    clf[0].fit(train_x, train_y)
-
-    features = ['Rh', 'T2m', 'MoveIn', 'MoveOut', 'Travel', 'WuhanProportion', 'People', 'GDP']
-    print(features)
-    importances = clf[0].feature_importances_
-    indices = np.argsort(importances)
-    feture_importance(features, indices, importances)
-
+    predict_plot(real_y, prediction_y)    
 
     return case, df_predict
 
@@ -219,7 +205,10 @@ def covid_all_predict(df, index, clf, threshold):
 if __name__ == '__main__':
 
 
-    df = gp.GeoDataFrame.from_file("./shp/china_city_distinct_COVID19.shp")
+    df = gp.GeoDataFrame.from_file("../shp/china_city_distinct_COVID19.shp")
+    #epidemicIds = [420100]
+    #df = df[~df['id'].isin(epidemicIds)]
+    
     
     kf = KFold(10, True)
     index = []
@@ -241,12 +230,12 @@ if __name__ == '__main__':
     df = pd.merge(df, df_predict, how='inner', on='id')
     df['diff'] = df['confirmed'] - df['predict']
     
-    #df.to_file("../result/COVID_rf_after.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_gbdt_after.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_svm_after.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_lasso_after.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_bp_after.shp", encoding='utf-8')
-    #df.to_file("../result/COVID_lars_after.shp", encoding='utf-8')
+    df.to_file("../result/COVID_rf.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_gbdt.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_svm.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_lasso.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_bp.shp", encoding='utf-8')
+    #df.to_file("../result/COVID_lars.shp", encoding='utf-8')
 
     epidemicIds = [420100]
     df = df[~df['id'].isin(epidemicIds)]

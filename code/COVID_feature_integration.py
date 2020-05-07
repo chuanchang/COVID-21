@@ -63,40 +63,39 @@ def get_feature_final():
 
     # 对label做log变换
     temp = df_all['confirmed'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'confirmed_log'] = temp
 
     temp = df_all['cured'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'cured_log'] = temp
     
     temp = df_all['dead'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'dead_log'] = temp
 
-
     temp = df_all['confirmed_before'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'confirmed_before_log'] = temp
 
     temp = df_all['cured_before'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'cured_before_log'] = temp
     
     temp = df_all['dead_before'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'dead_before_log'] = temp
 
     temp = df_all['confirmed_after'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'confirmed_after_log'] = temp
 
     temp = df_all['cured_after'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'cured_after_log'] = temp
     
     temp = df_all['dead_after'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1) for i in temp]
     df_all.loc[:, 'dead_after_log'] = temp
 
     import collections
@@ -176,7 +175,7 @@ def get_shp_final():
                         'people', 'GDPTotal', 'GDPPerson']
 
     # 2015 China city shp
-    path = './shp/china_city_UTM.shp'
+    path = './shp/china_city_UTM_final.shp'
     shp_city = gp.GeoDataFrame.from_file(path)
     shp_city.rename(columns={'city_id': 'id'}, inplace=True)
 

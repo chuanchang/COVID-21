@@ -46,6 +46,10 @@ def feature_importance_summary(shap_values, train_x):
 if __name__ == '__main__':
 
     df = gp.GeoDataFrame.from_file("./shp/china_city_distinct_COVID19.shp")
+    #epidemicIds = [420100]
+    #df = df[~df['id'].isin(epidemicIds)]
+    
+
     clf = RandomForestRegressor(n_estimators=20, min_samples_split=5, max_depth=5)
  
     # 全时间段建模
@@ -56,7 +60,7 @@ if __name__ == '__main__':
     'moveOutMea',
     'travelMean',
     'WuhanMean',
-    'people', 'GDPTotal',
+    'people', 'GDPTotal', 'DISTANCE',
     'confirmed','confirmLog']]
 
     df.columns = ['id','location',
@@ -66,7 +70,7 @@ if __name__ == '__main__':
     'MoveOut',
     'Travel',
     'WP',
-    'People', 'GDP',
+    'People', 'GDP',  'WD',
     'confirmed','confirmLog']
     
     train_y = df['confirmLog']

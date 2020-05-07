@@ -30,12 +30,12 @@ def predict_plot(real_y, prediction_y):
     plt.plot([-1, 20], [-1, 20], '--', color='black', label='1:1 line', linewidth=2.0)
         
     ############# 设置坐标刻度值的大小以及刻度值的字体 #############
-    plt.xlim(-0.5, 16)
-    plt.ylim(-0.5, 16)
+    plt.xlim(-0.5, 5)
+    plt.ylim(-0.5, 5)
     plt.tick_params(labelsize=30)
 
-    interval = list(range(0, 18, 2))
-    label = [2**(i)-1 for i in interval]
+    interval = list(range(0, 6, 1))
+    label = [10**(i)-1 for i in interval]
     plt.xticks(interval, label, rotation=0)
     plt.yticks(interval, label, rotation=0)
     
@@ -46,17 +46,23 @@ def predict_plot(real_y, prediction_y):
     ax = plt.gca()
     ax.set_aspect(1)
     
-    plt.savefig('./picture/GWR_CV.eps', dpi=400)
+    plt.savefig('./picture/RF_CV.eps', dpi=400)
     plt.show()
 
 # main
 if __name__ == '__main__':
-    #df = gp.GeoDataFrame.from_file("./result/COVID_rf.shp")
-    df = gp.GeoDataFrame.from_file("./result/COVID_gwr.shp")
-    df = df[['confirmLog', 'predict']]
+    df = gp.GeoDataFrame.from_file("./result/COVID_rf.shp")
+    #df = gp.GeoDataFrame.from_file("./result/COVID_gwr.shp")
+    df = df[['confirmed', 'predict']]
     temp = df['predict'].to_list()
-    temp = [math.log(i+1, 2) for i in temp]
+    temp = [math.log(i+1, 10) for i in temp]
     df.loc[:, 'predictLog'] = temp
-    print(max(df['confirmLog'].to_list()))
+
+    temp = df['confirmed'].to_list()
+    temp = [math.log(i+1, 10) for i in temp]
+    df.loc[:, 'confirmedLog'] = temp
+
+
+    print(max(df['confirmedLog'].to_list()))
     print(max(df['predictLog'].to_list()))
-    predict_plot(df['confirmLog'].to_list(), df['predictLog'].to_list())
+    predict_plot(df['confirmedLog'].to_list(), df['predictLog'].to_list())

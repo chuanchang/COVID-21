@@ -95,7 +95,7 @@ def covid_all_predict(df, index, threshold):
     'moveOutMea',
     'travelMean',
     'WuhanMean',
-    'people', 'GDPTotal', 'GDPPerson',
+    'people', 'GDPTotal', 'DISTANCE',
     'confirmed','confirmLog', 'X', 'Y']]
 
     real_y = []
@@ -139,10 +139,10 @@ def covid_all_predict(df, index, threshold):
         residuals = gwr_results.resid_response
 
         predict_ytrain_log = model.predict(np.array(cal_coords), train_x, scale, residuals).predictions.flatten()
-        predict_ytrain = np.trunc(2**(predict_ytrain_log) - 1)
+        predict_ytrain = np.trunc(np.exp(predict_ytrain_log) - 1)
 
         predict_ytest_log = model.predict(np.array(pred_coords), test_x, scale, residuals).predictions.flatten()
-        predict_ytest = np.trunc(2**(predict_ytest_log) - 1)
+        predict_ytest = np.trunc(np.exp(predict_ytest_log) - 1)
         
         
         real_y.extend(test_y)
